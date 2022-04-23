@@ -1,9 +1,10 @@
 import React from "react"
 
-import { render } from "react-dom"
+import { createRoot } from 'react-dom/client'
 
 import App from "./components/App"
 
 document.addEventListener("DOMContentLoaded", () => {
-  render(<App />, document.getElementById("App"))
+  const root = createRoot(document.getElementById("App"))
+  root.render(<App />)
 })
