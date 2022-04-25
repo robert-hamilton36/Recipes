@@ -1,0 +1,60 @@
+// https://dbdiagram.io/d
+
+Table users as U {
+  userId int [pk, increment] // auto-increment
+  firstName varchar
+  lastName varchar
+  email varchar
+  passwordHash varchar
+  createdAt timestamp
+}
+
+Table usersRecipe {
+  usersRecipeId int [pk]
+  userId int
+  recipeId int
+}
+
+Table recipes {
+  recipeId int [pk, increment]
+  name varchar
+}
+
+Table recipeSteps {
+  recipeStepId int [pk, increment]
+  recipeId int
+  stepNumber int
+  instructions varchar
+}
+
+Table recipeIngredients {
+  recipeIngredientId int [pk, increment]
+  recipeId int
+  ingredientId int
+  quantityAmount int
+  quantitydUnit int
+}
+
+Table ingredients {
+  ingredientId int [pk, increment]
+  ingredientName varchar
+}
+
+Table units {
+  unitId int [pk, increment]
+  unitName varchar
+}
+
+
+
+Ref: "users"."userId" < "usersRecipe"."userId"
+
+Ref: "recipes"."recipeId" < "usersRecipe"."recipeId"
+
+Ref: "recipeSteps"."recipeId" < "recipes"."recipeId"
+
+Ref: "recipeIngredients"."recipeId" < "recipes"."recipeId"
+
+Ref: "recipeIngredients"."ingredientId" < "ingredients"."ingredientId"
+
+Ref: "recipeIngredients"."quantitydUnit" < "units"."unitId"

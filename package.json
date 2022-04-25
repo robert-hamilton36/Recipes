@@ -7,6 +7,7 @@
     "dev": "run-p dev:client dev:server",
     "dev:client": "npm run webpack -- --watch",
     "dev:server": "nodemon --exec ts-node server/index.ts",
+    "knex": "knex --knexfile ./server/db/knexfile.js",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx .",
     "test": "jest",
     "webpack": "webpack --config ./client/webpack.config.js"
@@ -67,6 +68,9 @@
   },
   "dependencies": {
     "express": "^4.17.3",
+    "knex": "^2.0.0",
+    "pg": "^8.7.3",
+    "superagent": "^7.1.2",
     "ts-node": "^10.7.0"
   },
   "devDependencies": {
@@ -96,6 +100,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0",
+    "sqlite3": "^5.0.5",
     "supertest": "^6.2.2",
     "typescript": "^4.6.3",
     "webpack": "^5.72.0",
