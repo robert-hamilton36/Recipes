@@ -5,30 +5,29 @@ import cookieParser from "cookie-parser"
 
 export const testServerForRoute = (testRoute: Router) => {
   dotenv.config()
-  
+
   const server: express.Application = express()
-  
+
   server.use(express.json())
   server.use(express.static(path.join(__dirname, "public")))
-  server.use(cookieParser());
+  server.use(cookieParser())
 
-  
-  server.use('/test', testRoute)
-  
+  server.use("/test", testRoute)
+
   return server
 }
 
 export const testServerForMiddleWare = (middleware: Middleware) => {
   const server: express.Application = express()
-  
+
   server.use(express.json())
   server.use(express.static(path.join(__dirname, "public")))
-  server.use(cookieParser());
+  server.use(cookieParser())
 
   server.use(middleware)
-  server.get('/', (req, res) => {
+  server.get("/", (req, res) => {
     res.json({
-      result: 'no error'
+      result: "no error",
     })
   })
   return server
