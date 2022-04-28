@@ -2,7 +2,7 @@ import request from 'supertest'
 
 import authRouter from "../auth"
 
-import { testServerWithRoute } from "../../testing/server.mock"
+import { testServerForRoute } from "../../testing/server.mock"
 // imports to mock
 import { handleLoginErrors, handleRegisterErrors } from '../errorHandlers'
 import { createUser, getUserByEmail } from '../../db/functions/users'
@@ -25,11 +25,10 @@ const MockedGetUserByEmail = getUserByEmail as jest.Mock
 
 const MockedCreateToken = createToken as jest.Mock
 
-const mockedServer = testServerWithRoute(authRouter)
+const mockedServer = testServerForRoute(authRouter)
 
 const mockedJWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NjZ9.bCPwFmwbYVzA4PtlemRl4blw9rsr8sTLryfspBTmcfc"
 const mockRegisterData = {
-  username: "xXYounglinsgssssSlayerXx",
   firstName: "Anakin",
   lastName: "Skywalker",
   email: "AniSky@walker.com",
@@ -60,9 +59,16 @@ describe('POST /register', () => {
       expect(response.headers['content-type']).toContain('json')
     })
 
-    test('body contains token', async () => {
+    test('cookie contains jwt token and correct settings', async () => {
       const response = await request(mockedServer).post('/test/register').send(mockRegisterData)
-      expect(response.body.token).toBe(mockedJWT)
+      expect(response.headers["set-cookie"][0]).toContain(mockedJWT)
+      expect(response.headers["set-cookie"][0]).toContain('HttpOnly')
+      expect(response.headers["set-cookie"][0]).toContain('Max-Age=' + 7 * 24 * 60 * 60)
+    })
+
+    test('body contains id', async () => {
+      const response = await request(mockedServer).post('/test/register').send(mockRegisterData)
+      expect(response.body.id).toBe(66)
     })
   })
 
@@ -105,7 +111,7 @@ describe('POST /register', () => {
 describe('GET /login', () => {
   describe('valid request data', () => {
     beforeAll(() => {
-      MockedGetUserByEmail.mockReturnValue({id: 66, ...mockRegisterData})
+      MockedGetUserByEmail.mockReturnValue({userId: 66, ...mockRegisterData})
       MockedComparePasswords.mockReturnValue(true)
       MockedCreateToken.mockReturnValue(mockedJWT)
     })
@@ -119,9 +125,16 @@ describe('GET /login', () => {
       expect(response.headers['content-type']).toContain('json')
     })
 
-    test('body contains token', async () => {
+    test('body contains id', async () => {
       const response = await request(mockedServer).get('/test/login').send(mockLoginData)
-      expect(response.body.token).toBe(mockedJWT)
+      expect(response.body.id).toBe(66)
+    })
+
+    test('cookie contains jwt token and correct settings', async () => {
+      const response = await request(mockedServer).get('/test/login').send(mockLoginData)
+      expect(response.headers["set-cookie"][0]).toContain(mockedJWT)
+      expect(response.headers["set-cookie"][0]).toContain('HttpOnly')
+      expect(response.headers["set-cookie"][0]).toContain('Max-Age=' + 7 * 24 * 60 * 60)
     })
 
   })

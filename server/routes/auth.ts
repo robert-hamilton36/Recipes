@@ -5,6 +5,8 @@ import { createUser, getUserByEmail } from '../db/functions/users'
 import { comparePasswords, hashPassword } from '../bcrypt'
 import { createToken } from '../jwt'
 
+const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 days
+
 const authRouter = express.Router()
 
 authRouter.get('/login', async (req, res) => {
@@ -15,9 +17,8 @@ authRouter.get('/login', async (req, res) => {
     const passwordsMatch = await comparePasswords(password, user.passwordHash)
 
     if (passwordsMatch) {
-      return res.json({ 
-        token: createToken(user.userId) 
-      })
+      res.cookie('jwt', createToken(user.userId), { httpOnly: true, maxAge: maxAge } )
+      res.json({ id: user.userId })
     } else {
       throw new Error('Wrong password')
     }
@@ -33,9 +34,8 @@ authRouter.post('/register', async (req, res) => {
 
   try {
     const newId = await createUser(user)
-    return res.json({
-      token: createToken(newId)
-    })
+    res.cookie('jwt', createToken(newId), { httpOnly: true, maxAge: maxAge } )
+    res.json({ id: newId })
   } catch(err: unknown) {
     const { statusCode, error } = handleRegisterErrors(err)
     return res.status(statusCode).json({error})
