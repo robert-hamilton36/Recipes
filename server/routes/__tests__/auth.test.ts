@@ -6,13 +6,13 @@ import { testServerForRoute } from "../../testing/server.mock"
 // imports to mock
 import { handleLoginErrors, handleRegisterErrors } from '../errorHandlers'
 import { createUser, getUserByEmail } from '../../db/functions/users'
-import { comparePasswords, hashPassword } from '../../bcrypt'
-import { createToken } from '../../jwt'
+import { comparePasswords, hashPassword } from '../../utility/bcrypt'
+import { createToken } from '../../utility/jwt'
 
 jest.mock('../errorHandlers')
 jest.mock('../../db/functions/users')
-jest.mock('../../bcrypt')
-jest.mock('../../jwt')
+jest.mock('../../utility/bcrypt')
+jest.mock('../../utility/jwt')
 
 const MockedHandleLoginErrors = handleLoginErrors as jest.Mock
 const MockedHandleRegisterErrors = handleRegisterErrors as jest.Mock

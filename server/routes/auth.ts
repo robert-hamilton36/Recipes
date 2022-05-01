@@ -2,8 +2,8 @@ import express from 'express'
 
 import { handleLoginErrors, handleRegisterErrors } from './errorHandlers'
 import { createUser, getUserByEmail } from '../db/functions/users'
-import { comparePasswords, hashPassword } from '../bcrypt'
-import { createToken } from '../jwt'
+import { comparePasswords, hashPassword } from '../utility/bcrypt'
+import { createToken } from '../utility/jwt'
 
 const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 days
 
