@@ -1,4 +1,5 @@
-// https://dbdiagram.io/d
+V2
+https://dbdiagram.io/d
 
 Table users as U {
   userId int [pk, increment] // auto-increment
@@ -10,7 +11,7 @@ Table users as U {
 }
 
 Table usersRecipe {
-  usersRecipeId int [pk]
+  userRecipesId int [pk]
   userId int
   recipeId int
 }
@@ -18,6 +19,81 @@ Table usersRecipe {
 Table recipes {
   recipeId int [pk, increment]
   name varchar
+  cookTimeQuantity int
+  cookTimeUnit varchar
+  prepTimeQuantity int
+  prepTimeUnit varchar
+  instructions varchar
+  notes varchar
+}
+
+Table recipeIngredients {
+  recipeIngredientId int [pk, increment]
+  recipeId int
+  ingredientId int
+  quantityAmount int
+  quantitydUnit varchar
+}
+
+Table ingredients {
+  ingredientId int [pk, increment]
+  ingredientName varchar
+}
+
+
+Ref: "users"."userId" < "usersRecipe"."userId"
+
+Ref: "recipes"."recipeId" < "usersRecipe"."recipeId"
+
+Ref: "recipeIngredients"."recipeId" < "recipes"."recipeId"
+
+Ref: "recipeIngredients"."ingredientId" < "ingredients"."ingredientId"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Old version
+
+Table users as U {
+  userId int [pk, increment] // auto-increment
+  firstName varchar
+  lastName varchar
+  email varchar
+  passwordHash varchar
+  createdAt timestamp
+}
+
+Table usersRecipe {
+  userRecipesId int [pk]
+  userId int
+  recipeId int
+}
+
+Table recipes {
+  recipeId int [pk, increment]
+  name varchar
+  cookTimeQuantity int
+  cookTimeUnit varchar
+  prepTimeQuantity int
+  prepTimeUnit varchar
+  instructions varchar
+  notes varchar
 }
 
 Table recipeSteps {
