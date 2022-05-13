@@ -1,3 +1,10 @@
+export class InsertDBError extends Error {
+  constructor() {
+    super("Insert failed")
+    this.name = "DatabaseAddError"
+  }
+}
+
 export class GetDBError extends Error {
   constructor(itemType?: string, id?: number) {
     if(itemType && id) {
