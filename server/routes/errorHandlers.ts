@@ -14,10 +14,10 @@ export const handleLoginErrors = (err: unknown) => {
       error: err.message
     }
   }
-
+  // catch for if err isn't an Error
   return {
     statusCode: 500,
-    error: 'Something werid happened'
+    error: 'Something weird happened'
   }
 }
 
@@ -39,6 +39,29 @@ export const handleRegisterErrors = (err: unknown) => {
     }
   }
 }
+
+export const handleBasicDBCRUDFunctionErrors = (err: unknown) => {
+   if (err instanceof Error) {
+    // specific errors thrown from server/errors/crudDbErrors.ts
+    if (err.message.includes('Get failed:') || err.message.includes('Update failed:') || err.message.includes("Deletion failed:")) {
+      return {
+        statusCode: 400,
+        error: err.message
+      }
+    } 
+     
+    return {
+      statusCode: 500,
+      error: err.message
+    }
+  }
+  // catch for if err isn't an Error
+  return {
+    statusCode: 500,
+    error: 'Something weird happened'
+  }
+}
+
 
 interface KnexError extends Error{
   code: string;

@@ -34,7 +34,7 @@ describe('handleLoginErrors', () => {
 
     expect(handledData).toEqual({
       statusCode: 500,
-      error: 'Something werid happened'
+      error: 'Something weird happened'
     })
   })
 })
