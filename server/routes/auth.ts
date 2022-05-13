@@ -1,7 +1,7 @@
 import express from 'express'
 
 import { handleLoginErrors, handleRegisterErrors } from './errorHandlers'
-import { createUser, getUserByEmail } from '../db/functions/users'
+import { createUser, deleteUserByEmail, getUserByEmail } from '../db/functions/users'
 import { comparePasswords, hashPassword } from '../utility/bcrypt'
 import { createToken } from '../utility/jwt'
 
@@ -29,7 +29,7 @@ authRouter.get('/login', async (req, res) => {
 })
 
 authRouter.post('/register', async (req, res) => {
-  const { password, ...user } = req.body
+  const { passwordHash: password, ... user } =  req.body
   user.passwordHash = await hashPassword(password)
 
   try {
@@ -39,6 +39,16 @@ authRouter.post('/register', async (req, res) => {
   } catch(err: unknown) {
     const { statusCode, error } = handleRegisterErrors(err)
     return res.status(statusCode).json({error})
+  }
+})
+
+authRouter.delete('/delete', async (req, res) => {
+  console.log('delete')
+  try {
+    await deleteUserByEmail(req.body.email)
+    res.json({ message: 'user deleted'})
+  } catch (err: unknown) {
+    return res.status(500).json({error: err})
   }
 })
 
