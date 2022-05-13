@@ -2,11 +2,13 @@ import connection from '../connection'
 import { RecipeDatabase } from '../../types/DatabaseObjects'
 import { DeletionDBError, GetDBError, UpdateDBError } from '../../errors/crudDBErrors'
 
-export function addNewRecipe (recipe: Partial<RecipeDatabase>, db = connection): Promise<number> {
+const db = connection
+
+export function addNewRecipe (recipe: Partial<RecipeDatabase>): Promise<number> {
   return db('recipes').insert(recipe).then(id => id[0])
 }
 
-export function getRecipeByRecipeId (recipeId: number, db = connection): Promise<RecipeDatabase> {
+export function getRecipeByRecipeId (recipeId: number): Promise<RecipeDatabase> {
   return db('recipes')
     .select()
     .where('recipeId', recipeId)
@@ -19,7 +21,7 @@ export function getRecipeByRecipeId (recipeId: number, db = connection): Promise
     })
 }
 
-export function updateRecipe (recipeId: number, updatedRecipe: RecipeDatabase, db = connection):  Promise<number> {
+export function updateRecipe (recipeId: number, updatedRecipe: RecipeDatabase):  Promise<number> {
   return db('recipes')
     .where('recipeId', recipeId)
     .update(updatedRecipe)
@@ -32,7 +34,7 @@ export function updateRecipe (recipeId: number, updatedRecipe: RecipeDatabase, d
     })
 }
 
-export function deleteRecipe (recipeId: number, db = connection): Promise<number> {
+export function deleteRecipe (recipeId: number): Promise<number> {
   return db('recipes')
     .where('recipeId', recipeId)
     .del()

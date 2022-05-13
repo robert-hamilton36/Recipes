@@ -2,12 +2,13 @@ import connection from '../connection'
 import { RecipeIngredientDatabase } from '../../types/DatabaseObjects'
 import { DeletionDBError, GetDBError, UpdateDBError } from '../../errors/crudDBErrors'
 
-export function addNewRecipeIngredient (recipe: Partial<RecipeIngredientDatabase>, db = connection): Promise<number> {
-  console.log(recipe)
+const db = connection
+
+export function addNewRecipeIngredient (recipe: Partial<RecipeIngredientDatabase>): Promise<number> {
   return db('recipeIngredients').insert(recipe).then(id => id[0])
 }
 
-export function getRecipeIngredientsByRecipeId (recipeId: number, db = connection): Promise<RecipeIngredientDatabase[]> {
+export function getRecipeIngredientsByRecipeId (recipeId: number): Promise<RecipeIngredientDatabase[]> {
   return db('recipeIngredients')
     .select()
     .where('recipeId', recipeId)
@@ -19,12 +20,11 @@ export function getRecipeIngredientsByRecipeId (recipeId: number, db = connectio
     })
 }
 
-export function updateRecipeIngredient (recipeIngredientsId: number, updatedRecipe: RecipeIngredientDatabase, db = connection):  Promise<number> {
+export function updateRecipeIngredient (recipeIngredientsId: number, updatedRecipe: RecipeIngredientDatabase):  Promise<number> {
   return db('recipeIngredients')
     .where('recipeIngredientsId', recipeIngredientsId)
     .update(updatedRecipe)
     .then(rowsUpdated => {
-      console.log(rowsUpdated)
       if(rowsUpdated) {
         return rowsUpdated
       } else {
@@ -33,12 +33,11 @@ export function updateRecipeIngredient (recipeIngredientsId: number, updatedReci
     })
 }
 
-export function deleteRecipeIngredientsByRecipeId (recipeId: number, db = connection): Promise<number> {
+export function deleteRecipeIngredientsByRecipeId (recipeId: number): Promise<number> {
   return db('recipeIngredients')
     .where('recipeId', recipeId)
     .del()
     .then(rowsDeleted => {
-      console.log(rowsDeleted)
       if(rowsDeleted) {
         return rowsDeleted
       } else {

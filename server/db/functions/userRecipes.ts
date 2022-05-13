@@ -2,11 +2,13 @@ import connection from '../connection'
 import { UserRecipeDatabase } from '../../types/DatabaseObjects'
 import { DeletionDBError, GetDBError } from '../../errors/crudDBErrors'
 
-export function addNewUserRecipe (newUsersRecipe: Partial<UserRecipeDatabase>, db = connection): Promise<number> {
+const db = connection
+
+export function addNewUserRecipe (newUsersRecipe: Partial<UserRecipeDatabase>): Promise<number> {
   return db('userRecipes').insert(newUsersRecipe).then(id => id[0])
 }
 
-export function getAllUserRecipesByUserId (userId: number, db = connection): Promise<UserRecipeDatabase[]> {
+export function getAllUserRecipesByUserId (userId: number): Promise<UserRecipeDatabase[]> {
   return db('userRecipes')
     .select()
     .where('userId', userId)
@@ -19,7 +21,7 @@ export function getAllUserRecipesByUserId (userId: number, db = connection): Pro
 }
 
 
-export function deleteUserRecipeJoin (usersRecipeId: number, db = connection): Promise<number> {
+export function deleteUserRecipeJoin (usersRecipeId: number): Promise<number> {
   return db('userRecipes') 
     .where('userRecipesId', usersRecipeId)
     .del()
