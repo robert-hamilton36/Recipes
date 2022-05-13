@@ -2,17 +2,19 @@ import connection from '../connection'
 import { IngredientsDatabase } from '../../types/DatabaseObjects'
 import { DeletionDBError, GetDBError } from '../../errors/crudDBErrors'
 
-export function addNewIngredient (ingredient: Partial<IngredientsDatabase>, db = connection): Promise<number> {
+const db = connection
+
+export function addNewIngredient (ingredient: Partial<IngredientsDatabase>): Promise<number> {
   return db('ingredients').insert(ingredient).then(id => id[0])
+  //?todo custom catch error here??
 }
 
-export function getIngredientById (ingredientId: number, db = connection): Promise<IngredientsDatabase[]> {
+export function getIngredientById (ingredientId: number): Promise<IngredientsDatabase> {
   return db('ingredients')
     .select()
     .first()
     .where('ingredientId', ingredientId)
     .then(ingredient => {
-      console.log(ingredient)
       if(ingredient) {
         return ingredient
       } else {
@@ -21,13 +23,12 @@ export function getIngredientById (ingredientId: number, db = connection): Promi
     })
 }
 
-export function getIngredientByName (name: string, db = connection): Promise<IngredientsDatabase[]> {
+export function getIngredientByName (name: string): Promise<IngredientsDatabase> {
   return db('ingredients')
     .select()
     .first()
     .where('name', name)
     .then(ingredient => {
-      console.log(ingredient)
       if(ingredient) {
         return ingredient
       } else {
@@ -36,12 +37,26 @@ export function getIngredientByName (name: string, db = connection): Promise<Ing
     })
 }
 
-export function deleteIngredient (ingredientId: number, db = connection): Promise<number> {
+export function getIngredientIdByName (name: string): Promise<number> {
+  return db('ingredients')
+    .select()
+    .first()
+    .where('name', name)
+    .then(ingredient => {
+      if(ingredient) {
+        return ingredient.ingredientId
+      } else {
+        return null
+      }
+    })
+    .catch(() => null)
+}
+
+export function deleteIngredient (ingredientId: number): Promise<number> {
   return db('ingredients')
   .where('ingredientId', ingredientId)
   .del()
   .then(rowsDeleted => {
-    console.log(rowsDeleted)
     if(rowsDeleted) {
       return rowsDeleted
     } else {
