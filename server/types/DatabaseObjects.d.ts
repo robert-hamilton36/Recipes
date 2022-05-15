@@ -1,39 +1,39 @@
 export interface UserDatabase {
-  userId: readonly number;
-  firstName: string;
-  lastName: string;
+  id: readonly number;
+  first_name: string;
+  last_name: string;
   email: string;
-  passwordHash: string;
-  createdAt?: string;
+  password_hash: string;
+  created_at?: string;
 }
 
 interface UserRecipeDatabase {
-  userRecipesId: readonly number
-  userId: readonly number
-  recipeId: readonly number
+  id: readonly number
+  user_id: readonly number
+  recipe_id: readonly number
 }
 
 interface RecipeDatabase {
-  recipeId: readonly number;
+  id: readonly number;
   name: string;
-  cookTimeQuantity: number;
-  cookTimeUnit: string;
-  prepTimeQuantity: number;
-  prepTimeUnit: string;
+  cook_time_quantity: number;
+  cook_time_unit: string;
+  prep_time_quantity: number;
+  prep_time_unit: string;
   instructions: string;
   notes: string;
 }
 
 interface RecipeIngredientDatabase {
-  recipeIngredientsId: readonly number;
-  recipeId: readonly number;
-  ingredientId: readonly number;
-  ingredientName: string;
-  quantityAmount: number;
-  quantityUnit: string;
+  id: readonly number;
+  recipe_id: readonly number;
+  ingredient_id: readonly number;
+  ingredient_name: string;
+  quantity_amount: number;
+  quantity_unit: string;
 }
 
 interface IngredientsDatabase {
-  ingredientId: readonly number;
+  id: readonly number;
   name: string;
 }

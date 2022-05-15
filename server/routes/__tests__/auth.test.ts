@@ -111,7 +111,7 @@ describe('POST /register', () => {
 describe('GET /login', () => {
   describe('valid request data', () => {
     beforeAll(() => {
-      MockedGetUserByEmail.mockReturnValue({userId: 66, ...mockRegisterData})
+      MockedGetUserByEmail.mockReturnValue({id: 66, ...mockRegisterData})
       MockedComparePasswords.mockReturnValue(true)
       MockedCreateToken.mockReturnValue(mockedJWT)
     })

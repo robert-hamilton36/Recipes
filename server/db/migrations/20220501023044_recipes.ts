@@ -3,12 +3,12 @@ import { Knex } from "knex";
 
 export async function up (knex: Knex): Promise<void> {
   return knex.schema.createTable('recipes', table => {
-    table.increments('recipeId')
+    table.increments('id')
     table.string('name')
-    table.integer('cookTimeQuantity')
-    table.string('cookTimeUnit')
-    table.integer('prepTimeQuantity')
-    table.string('prepTimeUnit')
+    table.integer('cook_time_quantity')
+    table.string('cook_time_unit')
+    table.integer('prep_time_quantity')
+    table.string('prep_time_unit')
     table.string('instructions')
     table.string('notes')
   })

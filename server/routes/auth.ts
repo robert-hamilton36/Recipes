@@ -14,11 +14,11 @@ authRouter.get('/login', async (req, res) => {
 
   try {
     const user = await getUserByEmail(email)
-    const passwordsMatch = await comparePasswords(password, user.passwordHash)
+    const passwordsMatch = await comparePasswords(password, user.password_hash)
 
     if (passwordsMatch) {
-      res.cookie('jwt', createToken(user.userId), { httpOnly: true, maxAge: maxAge } )
-      res.json({ id: user.userId })
+      res.cookie('jwt', createToken(user.id), { httpOnly: true, maxAge: maxAge } )
+      res.json({ id: user.id})
     } else {
       throw new Error('Wrong password')
     }

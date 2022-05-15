@@ -2,6 +2,66 @@ V2
 https://dbdiagram.io/d
 
 Table users as U {
+  id int [pk, increment] // auto-increment
+  first_name varchar
+  last_name varchar
+  email varchar
+  password_hash varchar
+  created_at timestamp
+}
+
+Table users_recipe {
+  id int [pk]
+  user_id int
+  recipe_id int
+}
+
+Table recipes {
+  id int [pk, increment]
+  name varchar
+  cook_time_quantity int
+  cook_time_unit varchar
+  prep_time_quantity int
+  prep_time_unit varchar
+  instructions varchar
+  notes varchar
+}
+
+Table recipe_ingredients {
+  id int [pk, increment]
+  recipe_id int
+  ingredient_id int
+  quantity_amount int
+  quantity_unit varchar
+}
+
+Table ingredients {
+  id int [pk, increment]
+  ingredient_name varchar
+}
+
+
+Ref: "users"."id" < "users_recipe"."id"
+
+Ref: "recipes"."id" < "users_recipe"."recipe_id"
+
+Ref: "recipe_ingredients"."recipe_id" < "recipes"."id"
+
+Ref: "recipe_ingredients"."ingredient_id" < "ingredients"."id"
+
+
+
+
+
+
+
+
+
+
+
+camelCase
+
+Table users as U {
   userId int [pk, increment] // auto-increment
   firstName varchar
   lastName varchar
@@ -48,14 +108,6 @@ Ref: "recipes"."recipeId" < "usersRecipe"."recipeId"
 Ref: "recipeIngredients"."recipeId" < "recipes"."recipeId"
 
 Ref: "recipeIngredients"."ingredientId" < "ingredients"."ingredientId"
-
-
-
-
-
-
-
-
 
 
 
