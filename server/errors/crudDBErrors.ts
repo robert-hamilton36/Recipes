@@ -6,11 +6,11 @@ export class InsertDBError extends Error {
 }
 
 export class GetDBError extends Error {
-  constructor(itemType?: string, id?: number) {
-    if(itemType && id) {
-      super(`Get failed: No ${itemType} with id: ${id} found`)
+  constructor(itemType?: string) {
+    if(itemType) {
+      super(`Get failed: No ${itemType} found with given id`)
     } else {
-      super("Get failed: Nothing with id found")
+      super("Get failed: Nothing with given id found")
     }
 
     this.name = "DatabaseGetError"
@@ -18,11 +18,11 @@ export class GetDBError extends Error {
 }
 
 export class UpdateDBError extends Error {
-  constructor(itemType?: string, id?: number) {
-    if(itemType && id) {
-      super(`Update failed: No ${itemType} with id: ${id} found`)
+  constructor(itemType?: string) {
+    if(itemType) {
+      super(`Update failed: No ${itemType} found with given id`)
     } else {
-      super("Update failed: Nothing with id found")
+      super("Update failed: Nothing with given id found")
     }
 
     this.name = "DatabaseUpdateError"
@@ -30,11 +30,11 @@ export class UpdateDBError extends Error {
 }
 
 export class DeletionDBError extends Error {
-  constructor(itemType?: string, id?: number) {
-    if(itemType && id) {
-      super(`Deletion failed: No ${itemType} with id: ${id} found`)
+  constructor(itemType?: string) {
+    if(itemType) {
+      super(`Deletion failed: No ${itemType} found with given id`)
     } else {
-      super("Deletion failed: Nothing with id found")
+      super("Deletion failed: Nothing with given id found")
     }
 
     this.name = "DatabaseDeletionError"
