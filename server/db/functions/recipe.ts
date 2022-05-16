@@ -4,8 +4,8 @@ import connection from '../connection'
 
 import { addItemToDatabase, getIdByUniqueProperty } from './basicCrud'
 import { createRecipeIngredientDatabaseObject } from '../../utility/cleanJSONRecipeToDatabaseObjects'
-import { Ingredient } from '../../types/JSONRecipe'
-import { RecipeDatabase, UserRecipeDatabase } from '../../types/DatabaseObjects'
+import { Ingredient } from '../../../types/JSONRecipe'
+import { RecipeDatabase, UserRecipeDatabase } from '../../../types/DatabaseObjects'
 
 const db = connection
 

@@ -16,5 +16,5 @@
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
     "resolveJsonModule": true
   },
-  "include": ["server/**/*"]
+  "include": ["server/**/*", "types/JSONRecipe.d.ts", "types/DatabaseObjects.d.ts"]
 }

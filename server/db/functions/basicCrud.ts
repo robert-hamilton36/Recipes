@@ -1,5 +1,5 @@
 import { DeletionDBError, GetDBError } from '../../errors/crudDBErrors'
-import { IngredientsDatabase, RecipeDatabase, RecipeIngredientDatabase, UserRecipeDatabase } from '../../types/DatabaseObjects'
+import { IngredientsDatabase, RecipeDatabase, RecipeIngredientDatabase, UserRecipeDatabase } from '../../../types/DatabaseObjects'
 import connection from '../connection'
 
 type Table =  'ingredients' | 'recipe_ingredients' | 'recipes' |'user_recipes'

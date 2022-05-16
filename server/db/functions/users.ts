@@ -1,5 +1,5 @@
 import connection from '../connection'
-import { UserDatabase } from '../../types/DatabaseObjects'
+import { UserDatabase } from '../../../types/DatabaseObjects'
 
 const db = connection
 
