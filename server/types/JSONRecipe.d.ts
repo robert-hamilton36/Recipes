@@ -1,4 +1,4 @@
-interface QuantityUnit {
+export interface QuantityUnit {
   quantity: number;
   unit: string;
 }
@@ -14,7 +14,7 @@ interface Instruction {
   instructions: string;
 }
 
-export interface IncomingJSONRecipe {
+interface IncomingJSONRecipe {
   name: string;
   cookingTime: QuantityUnit;
   prepTime: QuantityUnit;

@@ -3,9 +3,10 @@ import { Knex } from 'knex'
 import connection from '../connection'
 
 import { addItemToDatabase, getIdByUniqueProperty } from './basicCrud'
-import { createRecipeIngredientDatabaseObject } from '../../utility/cleanJSONRecipeToDatabaseObjects'
-import { Ingredient } from '../../../types/JSONRecipe'
-import { RecipeDatabase, UserRecipeDatabase } from '../../../types/DatabaseObjects'
+
+import { RecipeDatabase, UserRecipeDatabase } from '../../types/DatabaseObjects'
+import { createRecipeIngredientDatabaseObject } from '../../functions/createDatabaseObjects'
+import { Ingredient } from '../../types/JSONRecipe'
 
 const db = connection
 

@@ -1,4 +1,4 @@
-import { IncomingJSONRecipe, Ingredient } from "../../types/JSONRecipe";
+import { IncomingJSONRecipe, Ingredient } from "../../types/JSONRecipe"
 
 export const CaramelSliceJSONRecipe: IncomingJSONRecipe = {
   name: "Healthier Date Cashew Caramel Chocolate Slice",
@@ -60,7 +60,7 @@ export const CaramelSliceJSONRecipe: IncomingJSONRecipe = {
 export const dateIngredient: Ingredient = {
   ingredient: 'Dates',
   quantity: {
-    quantity: 50,
+    quantity: 400,
     unit: 'g'
   }
 }
@@ -69,7 +69,7 @@ export const dateIngredientWithId: Ingredient = {
   ingredientId: 5,
   ingredient: 'Dates',
   quantity: {
-    quantity: 50,
+    quantity: 400,
     unit: 'g'
   }
 }
