@@ -43,15 +43,13 @@ export function getFirstItemBySelector (table: Table, selector: Selector, db = c
 }
 
 export function getIdByUniqueProperty (table: Table, property: Selector, db = connection) {
-  console.log(property)
   return db(table)
     .select()
     .where(property)
     .first()
     .then((result: Item | undefined) => {
-      console.log('results')
       if(result?.id) {
-        return result?.id
+        return result.id
       } else {
         throw new GetDBError(table)
       }
