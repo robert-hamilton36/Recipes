@@ -13,7 +13,7 @@ interface ErrorCode {
   error: string
 }
 
-const isUniqueConstraintError = (e: unknown) => {
+export const isUniqueConstraintError = (e: unknown) => {
   // Thrown from database error addItemToDatabase
   // 19 is sqlite3 error code for unique constraint
   // 23505 is pg error code, need to test this format is repeated for pg
@@ -55,8 +55,3 @@ export const handleLoginErrors = (err: unknown): ErrorCode => {
     error: 'Something went wrong'
   }
 }
-
-
-
-// for testing purposes
-export const TestIsUniqueConstraintError = isUniqueConstraintError

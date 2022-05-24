@@ -1,4 +1,4 @@
-import { handleLoginErrors, handleRegistrationErrors, TestIsUniqueConstraintError } from "../errorHandlers"
+import { handleLoginErrors, handleRegistrationErrors, isUniqueConstraintError } from "../errorHandlers"
 
 interface KnexError extends Error{
   code: string;
@@ -20,35 +20,35 @@ describe('isUniqueConstraintError()', () => {
   test('returns true for pg error', () => {
     const pgError = new KnexError('Unique Constraint', 23505)
 
-    const result = TestIsUniqueConstraintError(pgError)
+    const result = isUniqueConstraintError(pgError)
     expect(result).toBe(true)
   })
 
   test('returns true for sqlite3 error', () => {
     const pgError = new KnexError('Unique Constraint', 19)
   
-    const result = TestIsUniqueConstraintError(pgError)
+    const result = isUniqueConstraintError(pgError)
     expect(result).toBe(true)
   })
 
   test('returns false for KnexError with other erro codes', () => {
     const knexError = new KnexError('Sqlite Full', 13)
   
-    const result = TestIsUniqueConstraintError(knexError)
+    const result = isUniqueConstraintError(knexError)
     expect(result).toBe(false)
   })
 
   test('returns false for generic Error object', () => {
     const error = new Error('Error!')
   
-    const result = TestIsUniqueConstraintError(error)
+    const result = isUniqueConstraintError(error)
     expect(result).toBe(false)
   })
 
   test('returns false for generic object', () => {
     const obj = { message: 'Error!'}
   
-    const result = TestIsUniqueConstraintError(obj)
+    const result = isUniqueConstraintError(obj)
     expect(result).toBe(false)
   })
 })
@@ -59,7 +59,7 @@ describe('handleRegistrationErrors()', () => {
   jest.doMock('../errorHandlers', () => {
     return {
       __esModule: true,
-      TestIsUniqueConstraintError: MockIsUniqueContraintError
+      isUniqueConstraintError: MockIsUniqueContraintError
     }
   })
 
