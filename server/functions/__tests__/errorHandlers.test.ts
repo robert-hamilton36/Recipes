@@ -1,0 +1,140 @@
+import { handleLoginErrors, handleRegistrationErrors, TestIsUniqueConstraintError } from "../errorHandlers"
+
+interface KnexError extends Error{
+  code: string;
+  errno: number;
+}
+
+class KnexError extends Error {
+  constructor (message: string, errorCode: number) {
+    super(message)
+    this.errno = errorCode
+  }
+}
+
+describe('isUniqueConstraintError()', () => {
+
+  beforeAll(() => {
+    jest.requireActual('../errorHandlers')
+  })
+  test('returns true for pg error', () => {
+    const pgError = new KnexError('Unique Constraint', 23505)
+
+    const result = TestIsUniqueConstraintError(pgError)
+    expect(result).toBe(true)
+  })
+
+  test('returns true for sqlite3 error', () => {
+    const pgError = new KnexError('Unique Constraint', 19)
+  
+    const result = TestIsUniqueConstraintError(pgError)
+    expect(result).toBe(true)
+  })
+
+  test('returns false for KnexError with other erro codes', () => {
+    const knexError = new KnexError('Sqlite Full', 13)
+  
+    const result = TestIsUniqueConstraintError(knexError)
+    expect(result).toBe(false)
+  })
+
+  test('returns false for generic Error object', () => {
+    const error = new Error('Error!')
+  
+    const result = TestIsUniqueConstraintError(error)
+    expect(result).toBe(false)
+  })
+
+  test('returns false for generic object', () => {
+    const obj = { message: 'Error!'}
+  
+    const result = TestIsUniqueConstraintError(obj)
+    expect(result).toBe(false)
+  })
+})
+
+describe('handleRegistrationErrors()', () => {
+  const MockIsUniqueContraintError = jest.fn()
+
+  jest.doMock('../errorHandlers', () => {
+    return {
+      __esModule: true,
+      TestIsUniqueConstraintError: MockIsUniqueContraintError
+    }
+  })
+
+  test('returns http code 400 and error Email is taken, wiht a unique constraint error', () => {
+    MockIsUniqueContraintError.mockResolvedValueOnce(true)
+    const pgError = new KnexError('Unique Constraint', 23505)
+    const handledData = handleRegistrationErrors(pgError)
+
+    expect(handledData).toEqual({
+      code: 400,
+      error: 'Email is taken'
+    })
+  })
+
+  test('returns http code 500 and error Something went wrong, with generic error', () => {
+    MockIsUniqueContraintError.mockResolvedValueOnce(false)
+    const error = new Error('Unique Constraint')
+    const handledData = handleRegistrationErrors(error)
+
+    expect(handledData).toEqual({
+      code: 500,
+      error: 'Something went wrong'
+    })
+  })
+
+  test('returns http code 500 and error Something went wrong, with generic object', () => {
+    MockIsUniqueContraintError.mockResolvedValueOnce(false)
+    const error = { message: 'Unique Constraint'}
+    const handledData = handleRegistrationErrors(error)
+
+    expect(handledData).toEqual({
+      code: 500,
+      error: 'Something went wrong'
+    })
+  })
+})
+
+describe('handleLoginErrors()', () => {
+  test('returns http code 400 and error Wrong password, with a password error', () => {
+    const passwordError = new Error('Wrong password')
+    const handledData = handleLoginErrors(passwordError)
+
+    expect(handledData).toEqual({
+      code: 400,
+      error: 'Wrong password'
+    })
+  })
+
+  test('returns http code 400 and error Email does not exist, with a email error', () => {
+    const emailError = new Error('Email does not exist')
+    const handledData = handleLoginErrors(emailError)
+
+    expect(handledData).toEqual({
+      code: 400,
+      error: 'Email does not exist'
+    })
+  })
+
+  test('returns http code 500 and error Something went wrong, with generic error', () => {
+    const error = new Error('Sqlite Full')
+    const handledData = handleLoginErrors(error)
+
+    expect(handledData).toEqual({
+      code: 500,
+      error: 'Something went wrong'
+    })
+  })
+
+  test('returns http code 500 and error Something went wrong, with generic object', () => {
+    const error = { message: 'Sqlite Full' }
+    const handledData = handleLoginErrors(error)
+
+    expect(handledData).toEqual({
+      code: 500,
+      error: 'Something went wrong'
+    })
+  })
+})

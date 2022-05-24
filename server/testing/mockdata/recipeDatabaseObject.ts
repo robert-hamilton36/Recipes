@@ -1,4 +1,4 @@
-import { RecipeDatabase, RecipeIngredientDatabase } from "../../../types/DatabaseObjects";
+import { RecipeDatabase, RecipeIngredientDatabase } from "../../types/DatabaseObjects"
 
 export const CaramelSliceDatabaseObject: Partial<RecipeDatabase> = {
   name: "Healthier Date Cashew Caramel Chocolate Slice",
@@ -13,7 +13,7 @@ export const CaramelSliceDatabaseObject: Partial<RecipeDatabase> = {
 export const DateIngredientDatabaseObject:Partial<RecipeIngredientDatabase> = {
   recipe_id: 1,
   ingredient_id: 1,
-  ingredient_name: "dates",
+  ingredient_name: "Dates",
   quantity_unit: "g",
   quantity_amount: 400
 }
