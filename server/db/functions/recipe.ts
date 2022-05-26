@@ -6,12 +6,12 @@ import { addItemToDatabase, getIdByUniqueProperty } from './basicCrud'
 
 import { RecipeDatabase, UserRecipeDatabase } from '../../types/DatabaseObjects'
 import { createRecipeIngredientDatabaseObject } from '../../functions/createDatabaseObjects'
-import { Ingredient } from '../../types/JSONRecipe'
+import { JSONIngredient } from '../../types/JSONRecipe'
 import { isUniqueConstraintError } from '../../functions/errorHandlers'
 
 const db = connection
 
-const __getIngredientId = async (ingredient: Ingredient, trx: Knex.Transaction) => {
+const __getIngredientId = async (ingredient: JSONIngredient, trx: Knex.Transaction) => {
   let ingredientId: number
   const name = ingredient.ingredient
 
@@ -36,7 +36,7 @@ const __getIngredientId = async (ingredient: Ingredient, trx: Knex.Transaction) 
   return ingredientId
 }
 
-const __addIngredientToDatabase = async (ingredient: Ingredient, recipeId: number, trx: Knex.Transaction) => {
+const __addIngredientToDatabase = async (ingredient: JSONIngredient, recipeId: number, trx: Knex.Transaction) => {
   const ingredientId = await __getIngredientId(ingredient, trx)
   // create partial RecipeIngredientDatabaseObject
   const recipeIngredient = createRecipeIngredientDatabaseObject(ingredient, recipeId, ingredientId)
@@ -45,7 +45,7 @@ const __addIngredientToDatabase = async (ingredient: Ingredient, recipeId: numbe
   await addItemToDatabase('recipe_ingredients', recipeIngredient, trx)
 }
 
-export async function addRecipe (recipe: Partial<RecipeDatabase>, ingredients: Ingredient[], user_id: number) {
+export async function addRecipe (recipe: Partial<RecipeDatabase>, ingredients: JSONIngredient[], user_id: number) {
   try {
     return await db.transaction( async (trx) => {
       // add recipe to recipe table

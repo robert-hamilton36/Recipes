@@ -1,9 +1,9 @@
-export interface QuantityUnit {
+ interface QuantityUnit {
   quantity: number;
   unit: string;
 }
 
-interface Ingredient {
+interface JSONIngredient {
   ingredientId?: number;
   ingredient: string;
   quantity: QuantityUnit;
@@ -14,11 +14,11 @@ interface Instruction {
   instructions: string;
 }
 
-interface IncomingJSONRecipe {
+export interface JSONRecipe {
   name: string;
   cookingTime: QuantityUnit;
   prepTime: QuantityUnit;
   instructions: Instruction[];
-  ingredients: Ingredient[];
+  ingredients: JSONIngredient[];
   notes: string;
 }

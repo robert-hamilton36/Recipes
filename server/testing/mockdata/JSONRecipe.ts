@@ -1,6 +1,6 @@
-import { IncomingJSONRecipe, Ingredient } from "../../types/JSONRecipe"
+import { JSONRecipe, JSONIngredient } from "../../types/JSONRecipe"
 
-export const CaramelSliceJSONRecipe: IncomingJSONRecipe = {
+export const CaramelSliceJSONRecipe: JSONRecipe = {
   name: "Healthier Date Cashew Caramel Chocolate Slice",
   prepTime: {
     quantity: 15,
@@ -57,7 +57,7 @@ export const CaramelSliceJSONRecipe: IncomingJSONRecipe = {
   notes: "Creating a healthier version seemed like mission impossible at first, but after four attempts I have made a healthy date cashew chocolate caramel slice that mimics the flavour, texture and all round deliciousness of the original"
 }
 
-export const dateIngredient: Ingredient = {
+export const dateIngredient: JSONIngredient = {
   ingredient: 'Dates',
   quantity: {
     quantity: 400,
@@ -65,7 +65,7 @@ export const dateIngredient: Ingredient = {
   }
 }
 
-export const dateIngredientWithId: Ingredient = {
+export const dateIngredientWithId: JSONIngredient = {
   ingredientId: 5,
   ingredient: 'Dates',
   quantity: {

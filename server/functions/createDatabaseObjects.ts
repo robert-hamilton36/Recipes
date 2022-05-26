@@ -1,5 +1,5 @@
 import { IngredientsDatabase, RecipeDatabase, RecipeIngredientDatabase, UserDatabase } from "../types/DatabaseObjects"
-import { IncomingJSONRecipe, Ingredient } from "../types/JSONRecipe"
+import { JSONRecipe, JSONIngredient } from "../types/JSONRecipe"
 import { IncomingUser } from "../types/User"
 
 export const createUserDatabaseObject = ({ firstName, lastName, email }: Partial<IncomingUser>, passwordHash?:string): Partial<UserDatabase> => {
@@ -19,7 +19,7 @@ export const createUserRecipeJoinDatabaseObject = (userId: number, recipeId: num
   }
 }
 
-export const createRecipeDatabaseObject = (jsonRecipe: IncomingJSONRecipe): Partial<RecipeDatabase> => {
+export const createRecipeDatabaseObject = (jsonRecipe: JSONRecipe): Partial<RecipeDatabase> => {
   return {
     name: jsonRecipe.name,
     cook_time_quantity: jsonRecipe.cookingTime.quantity,
@@ -31,7 +31,7 @@ export const createRecipeDatabaseObject = (jsonRecipe: IncomingJSONRecipe): Part
   }
 }
 
-export const createRecipeIngredientDatabaseObject = (ingredient: Ingredient, recipeId: number, ingredientId: number): Partial<RecipeIngredientDatabase> => {
+export const createRecipeIngredientDatabaseObject = (ingredient: JSONIngredient, recipeId: number, ingredientId: number): Partial<RecipeIngredientDatabase> => {
   return {
     recipe_id: recipeId,
     ingredient_id: ingredientId,
