@@ -7,21 +7,9 @@ import { addItemToDatabase, getIdByUniqueProperty } from './basicCrud'
 import { RecipeDatabase, UserRecipeDatabase } from '../../types/DatabaseObjects'
 import { createRecipeIngredientDatabaseObject } from '../../functions/createDatabaseObjects'
 import { Ingredient } from '../../types/JSONRecipe'
+import { isUniqueConstraintError } from '../../functions/errorHandlers'
 
 const db = connection
-
-interface KnexError extends Error{
-  code: string;
-  errno: number;
-}
-
-const isUniqueConstraintError = (e: Error) => {
-  const error = e as KnexError
-  if (error?.errno === 23505 || error?.errno === 19) {
-    console.log('is true')
-    return true
-  }
-}
 
 const __getIngredientId = async (ingredient: Ingredient, trx: Knex.Transaction) => {
   let ingredientId: number
@@ -37,10 +25,8 @@ const __getIngredientId = async (ingredient: Ingredient, trx: Knex.Transaction) 
     } catch (e: unknown) {
       // this is a catch for a unique constraint error, which shouldn't happen
       // but would occur when for some reason an ingredient that exists and has an id is passed into here without an id
-      if (e instanceof Error && isUniqueConstraintError(e)) {
-        console.log('unique caught')
+      if (isUniqueConstraintError(e)) {
         ingredientId = await getIdByUniqueProperty('ingredients', { name }, trx)
-        console.log(ingredientId)
       } else {
         throw e
       }
@@ -78,6 +64,7 @@ export async function addRecipe (recipe: Partial<RecipeDatabase>, ingredients: I
     })
   }
   catch (e: unknown) {
-    console.log(e)
+    // log error
+    throw new Error('Transaction failed')
   }
 }
