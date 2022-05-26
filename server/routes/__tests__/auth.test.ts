@@ -8,8 +8,8 @@ import { IncomingAnakinDatabaseObject, IncomingAnakinEditDatabaseObject, Outgoin
 
 //_______________functions to mock_________________________________________________________________________________________________
 
-import { addItemToDatabase } from "../../db/functions/basicCrud"
-import { changeUserPassword, deleteUserByEmail, getUserByEmail, updateUserByEmail } from "../../db/functions/users";
+import { addItemToDatabase, deleteItemBySelector, updateItemBySelector } from "../../db/functions/basicCrud"
+import { changeUserPassword, getUserByEmail } from "../../db/functions/users";
 
 import { comparePasswords, hashPassword } from "../../functions/passwords"
 import { createToken } from "../../functions/jwt"
@@ -27,9 +27,9 @@ jest.mock("../../functions/errorHandlers")
 const MockedAddItemToDatabase = addItemToDatabase as jest.Mock
 
 const MockedChangeUserPassword = changeUserPassword as jest.Mock
-const MockedDeleteUserByEmail = deleteUserByEmail as jest.Mock
+const MockedDeleteItemBySelector = deleteItemBySelector as jest.Mock
 const MockedGetUserByEmail = getUserByEmail as jest.Mock
-const MockedUpdateUserByEmail = updateUserByEmail as jest.Mock
+const MockedUpdateItemBySelector = updateItemBySelector as jest.Mock
 
 const MockedComparePasswords = comparePasswords as jest.Mock
 const MockedHashPassword = hashPassword as jest.Mock
@@ -378,7 +378,7 @@ describe('PATCH /updateUser', () => {
       MockedGetUserByEmail.mockResolvedValue(1)
       MockedComparePasswords.mockResolvedValue(true)
       MockedCreateUserDatabaseObject.mockResolvedValue(IncomingAnakinEditDatabaseObject)
-      MockedUpdateUserByEmail.mockResolvedValue(1)
+      MockedUpdateItemBySelector.mockResolvedValue(1)
     })
     test('returns status code 200', async () => {
       const response = await request(mockedServer).patch('/updateUser').send(AnakingUpdateInfoData)
@@ -452,11 +452,11 @@ describe('PATCH /updateUser', () => {
       expect(response.body.error).toBe('Something went wrong')
     })
 
-    test('returns status code 500 with generic went wrong message, for generic updateUserByEmail error', async () => {
+    test('returns status code 500 with generic went wrong message, for generic updateItemBySelector error', async () => {
       MockedGetUserByEmail.mockResolvedValueOnce(OutgoingAnakinDatabaseObject)
       MockedComparePasswords.mockResolvedValueOnce(true)
       MockedCreateUserDatabaseObject.mockReturnValueOnce(IncomingAnakinEditDatabaseObject)
-      MockedUpdateUserByEmail.mockRejectedValueOnce(new Error("Cannot find 'email' email")) // /?some error
+      MockedUpdateItemBySelector.mockRejectedValueOnce(new Error("Cannot find 'email' email")) // /?some error
       MockedCreateHandleLoginErrors.mockReturnValueOnce({ code: 500, error: 'Something went wrong'})
 
       const response = await request(mockedServer).patch('/updateUser').send(AnakingUpdateInfoData)
@@ -495,7 +495,7 @@ describe('DELETE /delete', () => {
     beforeAll(() => {
       MockedGetUserByEmail.mockResolvedValue(1)
       MockedComparePasswords.mockResolvedValue(true)
-      MockedDeleteUserByEmail.mockResolvedValue(1)
+      MockedDeleteItemBySelector.mockResolvedValue(1)
     })
     test('returns status code 200', async () => {
       const response = await request(mockedServer).delete('/delete').send(AnakinLoginData)
@@ -558,10 +558,10 @@ describe('DELETE /delete', () => {
       expect(response.body.error).toBe('Something went wrong')
     })
 
-    test('returns status code 500 with generic went wrong message, for generic deleteUserByEmail error', async () => {
+    test('returns status code 500 with generic went wrong message, for generic deleteItemBySelector error', async () => {
       MockedGetUserByEmail.mockResolvedValueOnce(OutgoingAnakinDatabaseObject)
       MockedComparePasswords.mockResolvedValueOnce(true)
-      MockedDeleteUserByEmail.mockRejectedValueOnce(new Error('Cannot email of type undefined'))
+      MockedDeleteItemBySelector.mockRejectedValueOnce(new Error('Cannot email of type undefined'))
       MockedCreateHandleLoginErrors.mockReturnValueOnce({ code: 500, error: 'Something went wrong'})
       
       const response = await request(mockedServer).delete('/delete').send(AnakinLoginData)

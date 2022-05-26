@@ -10,14 +10,14 @@ interface Selector {
   [x: string]: number | string
 }
 
-export function addItemToDatabase (table: Table, item: Item, db = connection): Promise<number> {
-  return db(table)
+export async function addItemToDatabase (table: Table, item: Item, db = connection): Promise<number> {
+  return await db(table)
     .insert(item)
     .then(id => id[0])
 }
 
-export function getItemsBySelector (table: Table, selector: Selector, db = connection) {
-  return db(table)
+export async function getItemsBySelector (table: Table, selector: Selector, db = connection) {
+  return await db(table)
     .select()
     .where(selector)
     .then((results) => {
@@ -28,8 +28,8 @@ export function getItemsBySelector (table: Table, selector: Selector, db = conne
     })
 }
 
-export function getFirstItemBySelector (table: Table, selector: Selector, db = connection) {
-  return db(table)
+export async function getFirstItemBySelector (table: Table, selector: Selector, db = connection) {
+  return await db(table)
     .select()
     .where(selector)
     .first()
@@ -42,8 +42,8 @@ export function getFirstItemBySelector (table: Table, selector: Selector, db = c
     })
 }
 
-export function getIdByUniqueProperty (table: Table, property: Selector, db = connection) {
-  return db(table)
+export async function getIdByUniqueProperty (table: Table, property: Selector, db = connection) {
+  return await db(table)
     .select()
     .where(property)
     .first()
@@ -56,8 +56,12 @@ export function getIdByUniqueProperty (table: Table, property: Selector, db = co
     })
 }
 
-export function deleteItemBySelector (table: Table, selector: Selector, db = connection) {
-  return db(table)
+export async function updateItemBySelector (table: Table, selector: Selector, update: Item, db = connection) {
+  return await db(table).where(selector).update(update)
+}
+
+export async function deleteItemBySelector (table: Table, selector: Selector, db = connection) {
+  return await db(table)
     .where(selector)
     .del()
     .then(rowsDeleted => {

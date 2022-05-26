@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
-import { addItemToDatabase } from "../db/functions/basicCrud";
-import { changeUserPassword, deleteUserByEmail, getUserByEmail, updateUserByEmail } from "../db/functions/users";
+import { addItemToDatabase, deleteItemBySelector, updateItemBySelector } from "../db/functions/basicCrud";
+import { changeUserPassword, getUserByEmail } from "../db/functions/users";
 
 import { comparePasswords, hashPassword } from "../functions/passwords";
 import { createToken } from "../functions/jwt";
@@ -90,7 +90,7 @@ export const updateUser = async (req: Request, res: Response) => {
 
     if (passwordsMatch) {
       const editedUserDatabaseObject = createUserDatabaseObject(editedUser)
-      await updateUserByEmail(email, editedUserDatabaseObject)
+      await updateItemBySelector('users', { email }, editedUserDatabaseObject)
 
       return res.json({ userUpdated: true })
     } else {
@@ -118,7 +118,7 @@ export const deleteUser = async (req: Request, res: Response) => {
     const passwordsMatch = await comparePasswords(password, user.password_hash)
 
     if (passwordsMatch) {
-      await deleteUserByEmail(email)
+      await deleteItemBySelector('users', { email })
       res.cookie('jwt', '', { httpOnly: true, maxAge: 1 } )
       res.json({ deleted: true })
 
