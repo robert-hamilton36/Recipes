@@ -44,6 +44,16 @@ describe('createRecipeDatabaseObject()', () => {
 
     expect(result).toEqual(CaramelSliceDatabaseObject)
   })
+
+  test('creates a partial recipeDatabaseObject with name and cook time', () => {
+    const result = createRecipeDatabaseObject({ name: 'Caramel Slice', cookingTime: { quantity: 50, unit: 'mins' } })
+
+    expect(result).toEqual({
+      name: 'Caramel Slice',
+      cook_time_quantity: 50,
+      cook_time_unit: 'mins'
+    })
+  })
 })
 
 describe('createRecipeIngredientDatabaseObject()', () => {
@@ -51,6 +61,26 @@ describe('createRecipeIngredientDatabaseObject()', () => {
     const result = createRecipeIngredientDatabaseObject(dateIngredient, 1, 1)
 
     expect(result).toEqual(DateIngredientDatabaseObject)
+  })
+
+  test('creates a partial recipeIngredientDatabaseObject with recipeId and qauntity', () => {
+    const result = createRecipeIngredientDatabaseObject({ quantity: { quantity: 5, unit: 'cups' }}, 3)
+
+    expect(result).toEqual({
+      recipe_id: 3,
+      quantity_amount: 5,
+      quantity_unit: 'cups'
+    })
+  })
+
+  test('creates a partial recipeIngredientDatabaseObject with ingredientId and qauntity', () => {
+    const result = createRecipeIngredientDatabaseObject({ quantity: { quantity: 5, unit: 'cups' }}, undefined,3)
+
+    expect(result).toEqual({
+      ingredient_id: 3,
+      quantity_amount: 5,
+      quantity_unit: 'cups'
+    })
   })
 })
 
