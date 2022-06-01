@@ -3,6 +3,8 @@
 // if its a server error sends back 500 and a general
 // would log errors if implemented
 
+import { DeletionDBError, GetDBError, UpdateDBError } from "../db/functions/crudDBErrors"
+
 interface KnexError extends Error{
   code: string;
   errno: number;
@@ -49,6 +51,19 @@ export const handleLoginErrors = (err: unknown): ErrorCode => {
         error: err.message
       }
     } 
+  }
+  return {
+    code: 500,
+    error: 'Something went wrong'
+  }
+}
+
+export const handleGetUpdateDeleteRecipes = (err: unknown): ErrorCode => {
+  if (err instanceof GetDBError || err instanceof DeletionDBError || err instanceof UpdateDBError) {
+    return {
+      code: 400,
+      error: 'Wrong id'
+    }
   }
   return {
     code: 500,

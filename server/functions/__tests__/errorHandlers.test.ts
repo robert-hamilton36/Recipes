@@ -1,4 +1,5 @@
-import { handleLoginErrors, handleRegistrationErrors, isUniqueConstraintError } from "../errorHandlers"
+import { DeletionDBError, GetDBError, UpdateDBError } from "../../db/functions/crudDBErrors"
+import { handleGetUpdateDeleteRecipes, handleLoginErrors, handleRegistrationErrors, isUniqueConstraintError } from "../errorHandlers"
 
 interface KnexError extends Error{
   code: string;
@@ -136,5 +137,47 @@ describe('handleLoginErrors()', () => {
       code: 500,
       error: 'Something went wrong'
     })
+  })
+})
+
+describe('handleGetRecipes()', () => {
+  test('returns code: 400, error: Wrong id, with GetDBError()', () => {
+    const err = new GetDBError()
+    const { code, error } = handleGetUpdateDeleteRecipes(err)
+
+    expect(code).toBe(400)
+    expect(error).toBe('Wrong id')
+  })
+
+  test('returns code: 400, error: Wrong id, with UpdateDBError()', () => {
+    const err = new UpdateDBError()
+    const { code, error } = handleGetUpdateDeleteRecipes(err)
+
+    expect(code).toBe(400)
+    expect(error).toBe('Wrong id')
+  })
+
+  test('returns code: 400, error: Wrong id, with DeletionDBError()', () => {
+    const err = new DeletionDBError()
+    const { code, error } = handleGetUpdateDeleteRecipes(err)
+
+    expect(code).toBe(400)
+    expect(error).toBe('Wrong id')
+  })
+
+  test('returns code: 500, error:Something went wrong, with generic error', () => {
+    const err = new Error('Oh no!')
+    const { code, error } = handleGetUpdateDeleteRecipes(err)
+
+    expect(code).toBe(500)
+    expect(error).toBe('Something went wrong')
+  })
+
+  test('returns code: 500, error:Something went wrong, with generic object', () => {
+    const err = {}
+    const { code, error } = handleGetUpdateDeleteRecipes(err)
+
+    expect(code).toBe(500)
+    expect(error).toBe('Something went wrong')
   })
 })
