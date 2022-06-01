@@ -15,6 +15,7 @@ interface Instruction {
 }
 
 export interface JSONRecipe {
+  recipeId?: number;
   name: string;
   cookingTime: QuantityUnit;
   prepTime: QuantityUnit;
