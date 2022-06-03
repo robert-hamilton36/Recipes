@@ -2,7 +2,7 @@ import connection from '../connection'
 import { DeletionDBError, GetDBError } from './crudDBErrors'
 import { IngredientsDatabase, RecipeDatabase, RecipeIngredientDatabase, UserRecipeDatabase } from '../../types/DatabaseObjects'
 
-type Table =  'ingredients' | 'recipe_ingredients' | 'recipes' | 'user_recipes' | 'users'
+export type Table =  'ingredients' | 'recipe_ingredients' | 'recipes' | 'user_recipes' | 'users'
 type Item = Partial<IngredientsDatabase | RecipeIngredientDatabase | RecipeDatabase | UserRecipeDatabase>
 
 interface Selector {
