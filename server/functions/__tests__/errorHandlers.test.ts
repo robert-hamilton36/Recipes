@@ -140,29 +140,57 @@ describe('handleLoginErrors()', () => {
   })
 })
 
-describe('handleGetRecipes()', () => {
-  test('returns code: 400, error: Wrong id, with GetDBError()', () => {
-    const err = new GetDBError()
-    const { code, error } = handleGetUpdateDeleteRecipes(err)
-
-    expect(code).toBe(400)
-    expect(error).toBe('Wrong id')
+describe('handleGetUpdateDeleteRecipes()', () => {
+  describe('no given itemType', () => {
+    test('returns code: 400, error: Wrong id, with GetDBError()', () => {
+      const err = new GetDBError()
+      const { code, error } = handleGetUpdateDeleteRecipes(err)
+  
+      expect(code).toBe(400)
+      expect(error).toBe('GetError: Wrong id')
+    })
+  
+    test('returns code: 400, error: Wrong id, with UpdateDBError()', () => {
+      const err = new UpdateDBError()
+      const { code, error } = handleGetUpdateDeleteRecipes(err)
+  
+      expect(code).toBe(400)
+      expect(error).toBe('UpdateError: Wrong id')
+    })
+  
+    test('returns code: 400, error: Wrong id, with DeletionDBError()', () => {
+      const err = new DeletionDBError()
+      const { code, error } = handleGetUpdateDeleteRecipes(err)
+  
+      expect(code).toBe(400)
+      expect(error).toBe('DeletionError: Wrong id')
+    })
   })
 
-  test('returns code: 400, error: Wrong id, with UpdateDBError()', () => {
-    const err = new UpdateDBError()
-    const { code, error } = handleGetUpdateDeleteRecipes(err)
-
-    expect(code).toBe(400)
-    expect(error).toBe('Wrong id')
-  })
-
-  test('returns code: 400, error: Wrong id, with DeletionDBError()', () => {
-    const err = new DeletionDBError()
-    const { code, error } = handleGetUpdateDeleteRecipes(err)
-
-    expect(code).toBe(400)
-    expect(error).toBe('Wrong id')
+  describe('given itemType', () => {
+    test('returns code: 400, error: Wrong id, with GetDBError()', () => {
+      const err = new GetDBError('recipes')
+      const { code, error } = handleGetUpdateDeleteRecipes(err)
+  
+      expect(code).toBe(400)
+      expect(error).toBe("GetError: Wrong 'recipes' id")
+    })
+  
+    test('returns code: 400, error: Wrong id, with UpdateDBError()', () => {
+      const err = new UpdateDBError('user_recipes')
+      const { code, error } = handleGetUpdateDeleteRecipes(err)
+  
+      expect(code).toBe(400)
+      expect(error).toBe("UpdateError: Wrong 'user_recipes' id")
+    })
+  
+    test('returns code: 400, error: Wrong id, with DeletionDBError()', () => {
+      const err = new DeletionDBError('ingredients')
+      const { code, error } = handleGetUpdateDeleteRecipes(err)
+  
+      expect(code).toBe(400)
+      expect(error).toBe("DeletionError: Wrong 'ingredients' id")
+    })
   })
 
   test('returns code: 500, error:Something went wrong, with generic error', () => {

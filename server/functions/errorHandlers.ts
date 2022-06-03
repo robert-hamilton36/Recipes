@@ -60,9 +60,15 @@ export const handleLoginErrors = (err: unknown): ErrorCode => {
 
 export const handleGetUpdateDeleteRecipes = (err: unknown): ErrorCode => {
   if (err instanceof GetDBError || err instanceof DeletionDBError || err instanceof UpdateDBError) {
+    if (err.itemType) {
+      return {
+        code: 400,
+      error: `${err.name}: Wrong '${err.itemType}' id`
+      }
+    }
     return {
       code: 400,
-      error: 'Wrong id'
+      error: `${err.name}: Wrong id`
     }
   }
   return {

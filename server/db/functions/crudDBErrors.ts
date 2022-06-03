@@ -5,38 +5,49 @@
 //   }
 // }
 
+import { Table } from "./basicCrud"
+
 export class GetDBError extends Error {
-  constructor(itemType?: string) {
+  itemType: Table | null
+  constructor(itemType?: Table) {
     if(itemType) {
       super(`Get failed: No ${itemType} found with given id`)
+      this.itemType = itemType
     } else {
       super("Get failed: Nothing with given id found")
+      this.itemType = null
     }
 
-    this.name = "DatabaseGetError"
+    this.name = "GetError"
   }
 }
 
 export class UpdateDBError extends Error {
-  constructor(itemType?: string) {
+  itemType: Table | null
+  constructor(itemType?: Table) {
     if(itemType) {
       super(`Update failed: No ${itemType} found with given id`)
+      this.itemType = itemType
     } else {
       super("Update failed: Nothing with given id found")
+      this.itemType = null
     }
 
-    this.name = "DatabaseUpdateError"
+    this.name = "UpdateError"
   }
 }
 
 export class DeletionDBError extends Error {
-  constructor(itemType?: string) {
+  itemType: Table | null
+  constructor(itemType?: Table) {
     if(itemType) {
       super(`Deletion failed: No ${itemType} found with given id`)
+      this.itemType = itemType
     } else {
       super("Deletion failed: Nothing with given id found")
+      this.itemType = null
     }
 
-    this.name = "DatabaseDeletionError"
+    this.name = "DeletionError"
   }
 }
