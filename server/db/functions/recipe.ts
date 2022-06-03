@@ -2,12 +2,15 @@ import { Knex } from 'knex'
 
 import connection from '../connection'
 
-import { addItemToDatabase, getIdByUniqueProperty } from './basicCrud'
+import { addItemToDatabase, deleteItemBySelector, getFirstItemBySelector, getIdByUniqueProperty, getItemsBySelector, updateItemBySelector } from './basicCrud'
 
 import { RecipeDatabase, UserRecipeDatabase } from '../../types/DatabaseObjects'
-import { createRecipeIngredientDatabaseObject } from '../../functions/createDatabaseObjects'
-import { JSONIngredient } from '../../types/JSONRecipe'
+import { createRecipeDatabaseObject, createRecipeIngredientDatabaseObject } from '../../functions/createDatabaseObjects'
+import { JSONIngredient, JSONRecipe } from '../../types/JSONRecipe'
 import { isUniqueConstraintError } from '../../functions/errorHandlers'
+import { createRecipeJSONObject } from '../../functions/createJsonObjects'
+import { DeletionDBError, UpdateDBError } from './crudDBErrors'
+
 
 const db = connection
 
@@ -66,5 +69,68 @@ export async function addRecipe (recipe: Partial<RecipeDatabase>, ingredients: J
   catch (e: unknown) {
     // log error
     throw new Error('Transaction failed')
+  }
+}
+
+// function that calls this should catch errors
+export async function getRecipeById (id: number) {
+  // get recipe
+  const recipe = await getFirstItemBySelector('recipes', { id })
+
+  // get all recipeIngredients for above recipe
+  const recipeIngredients = await getItemsBySelector('recipe_ingredients', {'recipe_id': id})
+
+  // combine the ingredients and recipe to create JSON and return
+  return  createRecipeJSONObject(recipe, recipeIngredients)
+}
+
+// function that calls this should catch errors
+export async function getUsersRecipesByUserId (id: number) {
+  const userRecipes = await getItemsBySelector('user_recipes', { user_id: id })
+  return Promise.all(userRecipes.map((userRecipe) => {
+    return getRecipeById(userRecipe.recipe_id)
+
+  }))
+}
+
+export async function updateRecipe (incomingRecipe: Partial<JSONRecipe>) {
+  const { ingredients, ...recipeToEdit } = incomingRecipe
+  try {
+    return await db.transaction ( async (trx) => {
+      // if there are edited ingredients update them
+      if (ingredients) {
+        const editedIngredients = ingredients.map((ingredient) => createRecipeIngredientDatabaseObject(ingredient))
+        for (const ingredient of editedIngredients) {
+          if (ingredient.id === undefined) throw new Error('No Id')
+          const id = ingredient.id
+          await updateItemBySelector('recipe_ingredients', { id }, ingredient, trx)
+        }
+      }
+      // if it edits the recipe update it
+      if (recipeToEdit) {
+        if (recipeToEdit.recipeId === undefined) throw new Error('No Id')
+        const id = recipeToEdit.recipeId
+        const editedRecipe = createRecipeDatabaseObject(recipeToEdit)
+        await updateItemBySelector('recipes', { id }, editedRecipe, trx)
+      }
+      return 1
+    })
+  } catch (e: unknown) {
+    // log error
+    throw new UpdateDBError()
+  }
+}
+
+export async function deleteAllTraceOfRecipe (recipe_id: number) {
+  try {
+    return await db.transaction( async (trx) => {
+      await deleteItemBySelector('user_recipes', { recipe_id }, trx)
+      await deleteItemBySelector('recipes', { id: recipe_id }, trx)
+      await deleteItemBySelector('recipe_ingredients', { recipe_id }, trx)
+      // potentially delete all ingredients only used by this recipe
+    })
+  } catch(e: unknown) {
+    // log error
+    throw new DeletionDBError()
   }
 }
