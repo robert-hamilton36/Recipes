@@ -17,7 +17,7 @@ export class GetDBError extends Error {
       super("Get failed: Nothing with given id found")
       this.itemType = null
     }
-
+    Object.setPrototypeOf(this, GetDBError.prototype)
     this.name = "GetError"
   }
 }
@@ -32,7 +32,7 @@ export class UpdateDBError extends Error {
       super("Update failed: Nothing with given id found")
       this.itemType = null
     }
-
+    Object.setPrototypeOf(this, UpdateDBError.prototype)
     this.name = "UpdateError"
   }
 }
@@ -47,7 +47,7 @@ export class DeletionDBError extends Error {
       super("Deletion failed: Nothing with given id found")
       this.itemType = null
     }
-
+    Object.setPrototypeOf(this, DeletionDBError.prototype)
     this.name = "DeletionError"
   }
 }
