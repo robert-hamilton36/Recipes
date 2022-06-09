@@ -1,22 +1,32 @@
 import { Request, Response } from "express";
 
-import { deleteItemBySelector, getItemsBySelector } from "../db/functions/basicCrud";
-import { addRecipe, deleteAllTraceOfRecipe, getRecipeById, getUsersRecipesByUserId, updateRecipe } from "../db/functions/recipe";
+import { deleteItemBySelector } from "../db/functions/basicCrud";
+import { addRecipe, getRecipeById, getUsersRecipesByUserId, updateRecipe, userSavesRecipe } from "../db/functions/recipe";
 
-import { createRecipeDatabaseObject } from "../functions/createDatabaseObjects";
 import { handleGetUpdateDeleteRecipes } from "../functions/errorHandlers";
 
 import { JSONRecipe } from "../types/JSONRecipe";
 
 export const addNewRecipe = async (req: Request, res: Response) => {
-  const jsonRecipe: JSONRecipe = req.body.recipe
+  
+  try {
+    const jsonRecipe: JSONRecipe = req.body.recipe
+    const userId = req.body.userId
+    const recipeId = await addRecipe(jsonRecipe)
+    await userSavesRecipe(userId, recipeId)
+
+    res.json({ id: recipeId })
+  } catch (e: unknown) {
+    res.status(500).json({error: 'Something went wrong'})
+  }
+}
+
+export const saveRecipe = async (req: Request, res: Response) => {
+  const recipeId = parseInt(req.params.recipeId)
   const userId: number = req.body.userId
 
-  const ingredients = jsonRecipe.ingredients
-
   try {
-    const recipe = createRecipeDatabaseObject(jsonRecipe)
-    const id = await addRecipe(recipe, ingredients, userId)
+    const id = await userSavesRecipe(userId, recipeId)
 
     res.json({id})
   } catch (e: unknown) {
@@ -48,9 +58,10 @@ export const getRecipe = async (req: Request, res: Response) => {
 
 export const editRecipe = async (req: Request, res: Response) => {
   try {
+    const recipeId = parseInt(req.params.recipeId)
     const editedRecipe = req.body.edit as Partial<JSONRecipe>
 
-    await updateRecipe(editedRecipe)
+    await updateRecipe(recipeId, editedRecipe)
     res.json({ edited: true})
   } catch(e: unknown) {
     const {code, error} = handleGetUpdateDeleteRecipes(e)
@@ -58,21 +69,14 @@ export const editRecipe = async (req: Request, res: Response) => {
   }
 }
 
-export const deleteRecipe = async (req: Request, res: Response) => {
+export const unsaveRecipe = async (req: Request, res: Response) => {
   try {
     const recipe_id = parseInt(req.params.recipeId)
     const user_id = req.body.userId
-
-    const usersWhoHaveSavedRecipe = await getItemsBySelector('user_recipes', {recipe_id})
-
-    if (usersWhoHaveSavedRecipe.length === 1 && usersWhoHaveSavedRecipe[0].user_id === user_id) {
-      // delete the whole recipe
-      await deleteAllTraceOfRecipe(recipe_id)
-    } else {
-      // delete the recipe user connection for given user
-      await deleteItemBySelector('user_recipes', {user_id, recipe_id})
-    }
-    res.json({deleted: true})
+    // delete the recipe user connection for given user
+    await deleteItemBySelector('user_recipes', {user_id, recipe_id})
+    
+    res.json({unsaved: true})
   } catch(e) {
     const {code, error} = handleGetUpdateDeleteRecipes(e)
     res.status(code).json({ error })

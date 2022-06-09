@@ -4,7 +4,7 @@ import connection from '../connection'
 
 import { addItemToDatabase, deleteItemBySelector, getFirstItemBySelector, getIdByUniqueProperty, getItemsBySelector, updateItemBySelector } from './basicCrud'
 
-import { RecipeDatabase, UserRecipeDatabase } from '../../types/DatabaseObjects'
+import { UserRecipeDatabase } from '../../types/DatabaseObjects'
 import { createRecipeDatabaseObject, createRecipeIngredientDatabaseObject } from '../../functions/createDatabaseObjects'
 import { JSONIngredient, JSONRecipe } from '../../types/JSONRecipe'
 import { isUniqueConstraintError } from '../../functions/errorHandlers'
@@ -48,15 +48,19 @@ const __addIngredientToDatabase = async (ingredient: JSONIngredient, recipeId: n
   await addItemToDatabase('recipe_ingredients', recipeIngredient, trx)
 }
 
-export async function addRecipe (recipe: Partial<RecipeDatabase>, ingredients: JSONIngredient[], user_id: number) {
+export async function userSavesRecipe (user_id: number, recipe_id: number) {
+  // create and add user_recipe to table
+  const userRecipe: Partial<UserRecipeDatabase> = { user_id, recipe_id }
+  return await addItemToDatabase('user_recipes', userRecipe)
+}
+
+export async function addRecipe (jsonRecipe: Partial<JSONRecipe>) {
   try {
+    const ingredients = jsonRecipe?.ingredients || []
+    const recipe = createRecipeDatabaseObject(jsonRecipe)
     return await db.transaction( async (trx) => {
       // add recipe to recipe table
       const recipe_id = await addItemToDatabase('recipes', recipe, trx)
-    
-      // create and add user_recipe to table
-      const userRecipe: Partial<UserRecipeDatabase> = { user_id, recipe_id }
-      await addItemToDatabase('user_recipes', userRecipe, trx)
 
       for (const ingredient of ingredients) {
         // for each ingredient
@@ -93,25 +97,23 @@ export async function getUsersRecipesByUserId (id: number) {
   }))
 }
 
-export async function updateRecipe (incomingRecipe: Partial<JSONRecipe>) {
-  const { ingredients, ...recipeToEdit } = incomingRecipe
+export async function updateRecipe (recipe_id: number, incomingRecipe: Partial<JSONRecipe>) {
+  const ingredients = incomingRecipe?.ingredients
+  const editedRecipe = createRecipeDatabaseObject(incomingRecipe)
   try {
     return await db.transaction ( async (trx) => {
-      // if there are edited ingredients update them
+      // if it edits the recipes ingredients loop through and update them
       if (ingredients) {
-        const editedIngredients = ingredients.map((ingredient) => createRecipeIngredientDatabaseObject(ingredient))
-        for (const ingredient of editedIngredients) {
-          if (ingredient.id === undefined) throw new Error('No Id')
-          const id = ingredient.id
-          await updateItemBySelector('recipe_ingredients', { id }, ingredient, trx)
+        for (const ingredient of ingredients) {
+          const editedIngredients = createRecipeIngredientDatabaseObject(ingredient)
+          if (editedIngredients.ingredient_id === undefined) throw new Error('No Id')
+          const ingredient_id = editedIngredients.ingredient_id
+          await updateItemBySelector('recipe_ingredients', { ingredient_id, recipe_id }, editedIngredients, trx)
         }
       }
       // if it edits the recipe update it
-      if (recipeToEdit) {
-        if (recipeToEdit.recipeId === undefined) throw new Error('No Id')
-        const id = recipeToEdit.recipeId
-        const editedRecipe = createRecipeDatabaseObject(recipeToEdit)
-        await updateItemBySelector('recipes', { id }, editedRecipe, trx)
+      if (Object.keys(editedRecipe).length !== 0) {
+        await updateItemBySelector('recipes', { id: recipe_id }, editedRecipe, trx)
       }
       return 1
     })
