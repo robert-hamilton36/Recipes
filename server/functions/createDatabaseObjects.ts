@@ -38,7 +38,11 @@ export const createRecipeIngredientDatabaseObject = (ingredient: Partial<JSONIng
   const returnObj: Partial<RecipeIngredientDatabase> = {}
 
   if(recipeId) returnObj.recipe_id = recipeId
+  // when creating for first time ingredientId comes as an argument
   if(ingredientId) returnObj.ingredient_id = ingredientId
+  // when its already been created it is already in ingredients
+  if(ingredient.ingredientId) returnObj.ingredient_id = ingredient.ingredientId
+
   if(ingredient.ingredient) returnObj.ingredient_name = ingredient.ingredient
   if(ingredient?.quantity?.quantity) returnObj.quantity_amount = ingredient.quantity.quantity
   if(ingredient?.quantity?.unit) returnObj.quantity_unit = ingredient.quantity.unit

@@ -74,10 +74,30 @@ describe('createRecipeIngredientDatabaseObject()', () => {
   })
 
   test('creates a partial recipeIngredientDatabaseObject with ingredientId and qauntity', () => {
-    const result = createRecipeIngredientDatabaseObject({ quantity: { quantity: 5, unit: 'cups' }}, undefined,3)
+    const result = createRecipeIngredientDatabaseObject({ quantity: { quantity: 5, unit: 'cups' }}, undefined, 3)
 
     expect(result).toEqual({
       ingredient_id: 3,
+      quantity_amount: 5,
+      quantity_unit: 'cups'
+    })
+  })
+
+  test('creates a partial recipeIngredientDatabaseObject when incoming json contains ingredient id', () => {
+    const result = createRecipeIngredientDatabaseObject({ ingredientId: 4, quantity: {  quantity: 5, unit: 'cups' }})
+
+    expect(result).toEqual({
+      ingredient_id: 4,
+      quantity_amount: 5,
+      quantity_unit: 'cups'
+    })
+  })
+
+  test('creates a partial recipeIngredientDatabaseObject when incoming json contains ingredient id and as an argument', () => {
+    const result = createRecipeIngredientDatabaseObject({ ingredientId: 4, quantity: {  quantity: 5, unit: 'cups' }}, undefined, 3)
+
+    expect(result).toEqual({
+      ingredient_id: 4,
       quantity_amount: 5,
       quantity_unit: 'cups'
     })
