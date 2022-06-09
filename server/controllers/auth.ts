@@ -80,7 +80,7 @@ export const changePassword = async (req: Request, res: Response) => {
 }
 
 export const updateUser = async (req: Request, res: Response) => {
-  const editedUser = req.body.user as IncomingUser
+  const editedUser = req.body.editedUser as IncomingUser
   const email = req.body.email as string
   const password = req.body.password as string
 
