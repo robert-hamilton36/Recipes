@@ -15,7 +15,7 @@ export const addNewRecipe = async (req: Request, res: Response) => {
     const recipeId = await addRecipe(jsonRecipe)
     await userSavesRecipe(userId, recipeId)
 
-    res.json({ id: recipeId })
+    res.status(201).json({ id: recipeId })
   } catch (e: unknown) {
     res.status(500).json({error: 'Something went wrong'})
   }
@@ -28,7 +28,7 @@ export const saveRecipe = async (req: Request, res: Response) => {
   try {
     const id = await userSavesRecipe(userId, recipeId)
 
-    res.json({id})
+    res.status(201).json({id})
   } catch (e: unknown) {
     res.status(500).json({error: 'Something went wrong'})
   }

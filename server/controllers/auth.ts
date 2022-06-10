@@ -24,7 +24,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const token = createToken(newUserId)
 
     res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge } )
-    res.json({ id: newUserId })
+    res.status(201).json({ id: newUserId })
   } catch (err: unknown) {
     const { code, error } = handleRegistrationErrors(err)
     return res.status(code).json({ error })

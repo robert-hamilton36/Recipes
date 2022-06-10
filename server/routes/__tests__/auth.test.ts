@@ -58,7 +58,7 @@ describe('POST /register', () => {
 
     test('returns status code 200', async () => {
       const response = await request(mockedServer).post('/register').send({ user: AnakinRegisterData })
-      expect(response.statusCode).toBe(200)
+      expect(response.statusCode).toBe(201)
     })
 
     test('header specifies content type json', async () => {
