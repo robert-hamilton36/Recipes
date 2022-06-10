@@ -27,7 +27,7 @@ export const isUniqueConstraintError = (e: unknown) => {
   }
   return false
 }
-
+// TODO?? could be combined with Login Errors
 export const handleRegistrationErrors = (err: unknown): ErrorCode => {
   if (isUniqueConstraintError(err)) {
     return {

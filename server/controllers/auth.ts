@@ -52,8 +52,6 @@ export const loginUser = async (req: Request, res: Response) => {
   }
 }
 
-// todo check and test error handlers
-
 export const changePassword = async (req: Request, res: Response) => {
   const { email, oldPassword, newPassword } = req.body
 
