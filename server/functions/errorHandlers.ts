@@ -3,15 +3,19 @@
 // if its a server error sends back 500 and a general
 // would log errors if implemented
 
-import { DeletionDBError, GetDBError, UpdateDBError } from "../db/functions/crudDBErrors"
+import {
+  DeletionDBError,
+  GetDBError,
+  UpdateDBError,
+} from "../db/functions/crudDBErrors"
 
-interface KnexError extends Error{
-  code: string;
-  errno: number;
+interface KnexError extends Error {
+  code: string
+  errno: number
 }
 
 interface ErrorCode {
-  code: number,
+  code: number
   error: string
 }
 
@@ -32,47 +36,54 @@ export const handleRegistrationErrors = (err: unknown): ErrorCode => {
   if (isUniqueConstraintError(err)) {
     return {
       code: 400,
-      error: 'Email is taken'
+      error: "Email is taken",
     }
   }
   return {
     code: 500,
-    error: 'Something went wrong'
+    error: "Something went wrong",
   }
 }
 
 export const handleLoginErrors = (err: unknown): ErrorCode => {
   if (err instanceof Error) {
-    // Wrong password thrown from loginUser() from  controllers/auth 
+    // Wrong password thrown from loginUser() from  controllers/auth
     // Email does not exist thrown from getUserByEmail() /db/functions/users
-    if (err.message === 'Wrong password' || err.message === 'Email does not exist') {
+    if (
+      err.message === "Wrong password" ||
+      err.message === "Email does not exist"
+    ) {
       return {
         code: 400,
-        error: err.message
+        error: err.message,
       }
-    } 
+    }
   }
   return {
     code: 500,
-    error: 'Something went wrong'
+    error: "Something went wrong",
   }
 }
 
 export const handleGetUpdateDeleteRecipes = (err: unknown): ErrorCode => {
-  if (err instanceof GetDBError || err instanceof DeletionDBError || err instanceof UpdateDBError) {
+  if (
+    err instanceof GetDBError ||
+    err instanceof DeletionDBError ||
+    err instanceof UpdateDBError
+  ) {
     if (err.itemType) {
       return {
         code: 400,
-      error: `${err.name}: Wrong '${err.itemType}' id`
+        error: `${err.name}: Wrong '${err.itemType}' id`,
       }
     }
     return {
       code: 400,
-      error: `${err.name}: Wrong id`
+      error: `${err.name}: Wrong id`,
     }
   }
   return {
     code: 500,
-    error: 'Something went wrong'
+    error: "Something went wrong",
   }
 }
