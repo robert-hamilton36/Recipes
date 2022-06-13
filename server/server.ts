@@ -12,9 +12,9 @@ const server: express.Application = express()
 
 server.use(express.json())
 server.use(express.static(path.join(__dirname, "public")))
-server.use(cookieParser());
+server.use(cookieParser())
 
-server.use('/api/v1/auth', authRouter)
-server.use('/api/v1/recipe', recipeRouter)
+server.use("/api/v1/auth", authRouter)
+server.use("/api/v1/recipe", recipeRouter)
 
 export default server
