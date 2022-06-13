@@ -10,7 +10,7 @@ import { Table } from "./basicCrud"
 export class GetDBError extends Error {
   itemType: Table | null
   constructor(itemType?: Table) {
-    if(itemType) {
+    if (itemType) {
       super(`Get failed: No ${itemType} found with given id`)
       this.itemType = itemType
     } else {
@@ -25,7 +25,7 @@ export class GetDBError extends Error {
 export class UpdateDBError extends Error {
   itemType: Table | null
   constructor(itemType?: Table) {
-    if(itemType) {
+    if (itemType) {
       super(`Update failed: No ${itemType} found with given id`)
       this.itemType = itemType
     } else {
@@ -40,7 +40,7 @@ export class UpdateDBError extends Error {
 export class DeletionDBError extends Error {
   itemType: Table | null
   constructor(itemType?: Table) {
-    if(itemType) {
+    if (itemType) {
       super(`Deletion failed: No ${itemType} found with given id`)
       this.itemType = itemType
     } else {
