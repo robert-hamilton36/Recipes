@@ -4,10 +4,8 @@ import {
   UpdateDBError,
 } from "../../db/functions/crudDBErrors"
 import {
-  handleGetUpdateDeleteRecipes,
-  handleLoginErrors,
-  handleRegistrationErrors,
-  isUniqueConstraintError,
+  handleErrors,
+  isUniqueConstraintError
 } from "../errorHandlers"
 
 interface KnexError extends Error {
@@ -62,7 +60,7 @@ describe("isUniqueConstraintError()", () => {
   })
 })
 
-describe("handleRegistrationErrors()", () => {
+describe("handleErrors()", () => {
   const MockIsUniqueContraintError = jest.fn()
 
   jest.doMock("../errorHandlers", () => {
@@ -72,10 +70,10 @@ describe("handleRegistrationErrors()", () => {
     }
   })
 
-  test("returns http code 400 and error Email is taken, wiht a unique constraint error", () => {
+  test("returns http code 400 and error Email is taken, with a unique constraint error", () => {
     MockIsUniqueContraintError.mockResolvedValueOnce(true)
     const pgError = new KnexError("Unique Constraint", 23505)
-    const handledData = handleRegistrationErrors(pgError)
+    const handledData = handleErrors(pgError)
 
     expect(handledData).toEqual({
       code: 400,
@@ -83,33 +81,9 @@ describe("handleRegistrationErrors()", () => {
     })
   })
 
-  test("returns http code 500 and error Something went wrong, with generic error", () => {
-    MockIsUniqueContraintError.mockResolvedValueOnce(false)
-    const error = new Error("Unique Constraint")
-    const handledData = handleRegistrationErrors(error)
-
-    expect(handledData).toEqual({
-      code: 500,
-      error: "Something went wrong",
-    })
-  })
-
-  test("returns http code 500 and error Something went wrong, with generic object", () => {
-    MockIsUniqueContraintError.mockResolvedValueOnce(false)
-    const error = { message: "Unique Constraint" }
-    const handledData = handleRegistrationErrors(error)
-
-    expect(handledData).toEqual({
-      code: 500,
-      error: "Something went wrong",
-    })
-  })
-})
-
-describe("handleLoginErrors()", () => {
   test("returns http code 400 and error Wrong password, with a password error", () => {
     const passwordError = new Error("Wrong password")
-    const handledData = handleLoginErrors(passwordError)
+    const handledData = handleErrors(passwordError)
 
     expect(handledData).toEqual({
       code: 400,
@@ -119,7 +93,7 @@ describe("handleLoginErrors()", () => {
 
   test("returns http code 400 and error Email does not exist, with a email error", () => {
     const emailError = new Error("Email does not exist")
-    const handledData = handleLoginErrors(emailError)
+    const handledData = handleErrors(emailError)
 
     expect(handledData).toEqual({
       code: 400,
@@ -127,33 +101,11 @@ describe("handleLoginErrors()", () => {
     })
   })
 
-  test("returns http code 500 and error Something went wrong, with generic error", () => {
-    const error = new Error("Sqlite Full")
-    const handledData = handleLoginErrors(error)
-
-    expect(handledData).toEqual({
-      code: 500,
-      error: "Something went wrong",
-    })
-  })
-
-  test("returns http code 500 and error Something went wrong, with generic object", () => {
-    const error = { message: "Sqlite Full" }
-    const handledData = handleLoginErrors(error)
-
-    expect(handledData).toEqual({
-      code: 500,
-      error: "Something went wrong",
-    })
-  })
-})
-
-describe("handleGetUpdateDeleteRecipes()", () => {
   describe("for GetDBError | DeletionDBError | UpdateDBError", () => {
     describe("no given itemType", () => {
       test("returns code: 400, error: Wrong id, with GetDBError()", () => {
         const err = new GetDBError()
-        const { code, error } = handleGetUpdateDeleteRecipes(err)
+        const { code, error } = handleErrors(err)
 
         expect(code).toBe(400)
         expect(error).toBe("GetError: Wrong id")
@@ -161,7 +113,7 @@ describe("handleGetUpdateDeleteRecipes()", () => {
 
       test("returns code: 400, error: Wrong id, with UpdateDBError()", () => {
         const err = new UpdateDBError()
-        const { code, error } = handleGetUpdateDeleteRecipes(err)
+        const { code, error } = handleErrors(err)
 
         expect(code).toBe(400)
         expect(error).toBe("UpdateError: Wrong id")
@@ -169,7 +121,7 @@ describe("handleGetUpdateDeleteRecipes()", () => {
 
       test("returns code: 400, error: Wrong id, with DeletionDBError()", () => {
         const err = new DeletionDBError()
-        const { code, error } = handleGetUpdateDeleteRecipes(err)
+        const { code, error } = handleErrors(err)
 
         expect(code).toBe(400)
         expect(error).toBe("DeletionError: Wrong id")
@@ -179,7 +131,7 @@ describe("handleGetUpdateDeleteRecipes()", () => {
     describe("given itemType", () => {
       test("returns code: 400, error: Wrong id, with GetDBError()", () => {
         const err = new GetDBError("recipes")
-        const { code, error } = handleGetUpdateDeleteRecipes(err)
+        const { code, error } = handleErrors(err)
 
         expect(code).toBe(400)
         expect(error).toBe("GetError: Wrong 'recipes' id")
@@ -187,7 +139,7 @@ describe("handleGetUpdateDeleteRecipes()", () => {
 
       test("returns code: 400, error: Wrong id, with UpdateDBError()", () => {
         const err = new UpdateDBError("user_recipes")
-        const { code, error } = handleGetUpdateDeleteRecipes(err)
+        const { code, error } = handleErrors(err)
 
         expect(code).toBe(400)
         expect(error).toBe("UpdateError: Wrong 'user_recipes' id")
@@ -195,7 +147,7 @@ describe("handleGetUpdateDeleteRecipes()", () => {
 
       test("returns code: 400, error: Wrong id, with DeletionDBError()", () => {
         const err = new DeletionDBError("ingredients")
-        const { code, error } = handleGetUpdateDeleteRecipes(err)
+        const { code, error } = handleErrors(err)
 
         expect(code).toBe(400)
         expect(error).toBe("DeletionError: Wrong 'ingredients' id")
@@ -203,21 +155,20 @@ describe("handleGetUpdateDeleteRecipes()", () => {
     })
   })
 
-  describe("500 errors", () => {
-    test("returns code: 500, error:Something went wrong, with generic error", () => {
-      const err = new Error("Oh no!")
-      const { code, error } = handleGetUpdateDeleteRecipes(err)
+  test("returns code: 500, error:Something went wrong, with generic error", () => {
+    const err = new Error("Oh no!")
+    const { code, error } = handleErrors(err)
 
-      expect(code).toBe(500)
-      expect(error).toBe("Something went wrong")
-    })
-
-    test("returns code: 500, error:Something went wrong, with generic object", () => {
-      const err = {}
-      const { code, error } = handleGetUpdateDeleteRecipes(err)
-
-      expect(code).toBe(500)
-      expect(error).toBe("Something went wrong")
-    })
+    expect(code).toBe(500)
+    expect(error).toBe("Something went wrong")
   })
+
+  test("returns code: 500, error:Something went wrong, with generic object", () => {
+    const err = {}
+    const { code, error } = handleErrors(err)
+
+    expect(code).toBe(500)
+    expect(error).toBe("Something went wrong")
+  })
+ 
 })

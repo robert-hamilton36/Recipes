@@ -34,10 +34,7 @@ import { changeUserPassword, getUserByEmail } from "../../db/functions/users"
 import { comparePasswords, hashPassword } from "../../functions/passwords"
 import { createToken } from "../../functions/jwt"
 import { createUserDatabaseObject } from "../../functions/createDatabaseObjects"
-import {
-  handleLoginErrors,
-  handleRegistrationErrors,
-} from "../../functions/errorHandlers"
+import { KnexError } from "../../functions/errorHandlers"
 
 jest.mock("../../db/functions/basicCrud")
 jest.mock("../../db/functions/users")
@@ -45,7 +42,6 @@ jest.mock("../../db/functions/users")
 jest.mock("../../functions/passwords")
 jest.mock("../../functions/jwt")
 jest.mock("../../functions/createDatabaseObjects")
-jest.mock("../../functions/errorHandlers")
 
 const MockedAddItemToDatabase = addItemToDatabase as jest.Mock
 
@@ -60,10 +56,6 @@ const MockedHashPassword = hashPassword as jest.Mock
 const MockedCreateToken = createToken as jest.Mock
 
 const MockedCreateUserDatabaseObject = createUserDatabaseObject as jest.Mock
-
-const MockedCreateHandleLoginErrors = handleLoginErrors as jest.Mock
-const MockedCreateHandleRegistrationErrors =
-  handleRegistrationErrors as jest.Mock
 
 //___________end functions to mock_________________________________________________________________________________________________
 
@@ -119,16 +111,11 @@ describe("POST /register", () => {
       MockedCreateUserDatabaseObject.mockReturnValue(
         IncomingAnakinDatabaseObject
       )
-      MockedCreateHandleRegistrationErrors.mockReturnValue({
-        code: 400,
-        error: "Email is taken",
-      })
     })
     test("returns status code 400 with Email taken error message for sqlite3", async () => {
-      MockedAddItemToDatabase.mockRejectedValueOnce({
-        errno: 23505,
-        message: "UNIQUE_CONSTRAINT",
-      })
+      const MockedError = new Error("UNIQUE_CONSTRAINT") as KnexError
+      MockedError.errno = 19
+      MockedAddItemToDatabase.mockRejectedValueOnce(MockedError)
 
       const response = await request(mockedServer)
         .post("/register")
@@ -139,10 +126,9 @@ describe("POST /register", () => {
     })
 
     test("returns status code 400 with Email taken error message for postgres", async () => {
-      MockedAddItemToDatabase.mockRejectedValueOnce({
-        errno: 23505,
-        message: "UNIQUE_CONSTRAINT",
-      })
+      const MockedError = new Error("UNIQUE_CONSTRAINT") as KnexError
+      MockedError.errno = 23505
+      MockedAddItemToDatabase.mockRejectedValueOnce(MockedError)
 
       const response = await request(mockedServer)
         .post("/register")
@@ -158,11 +144,6 @@ describe("POST /register", () => {
         error: "No idea what errors this may throw",
       })
 
-      MockedCreateHandleRegistrationErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
-
       const response = await request(mockedServer)
         .post("/register")
         .send({ user: AnakinRegisterData })
@@ -175,11 +156,7 @@ describe("POST /register", () => {
       MockedCreateUserDatabaseObject.mockImplementationOnce(() => {
         throw new Error("TypeError: can't access property 'x' of 'y'")
       })
-      MockedCreateHandleRegistrationErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
-
+ 
       const response = await request(mockedServer)
         .post("/register")
         .send({ user: AnakinRegisterData })
@@ -196,11 +173,7 @@ describe("POST /register", () => {
         errno: 18,
         message: "SQLITE_TOOBIG",
       })
-      MockedCreateHandleRegistrationErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
-
+ 
       const response = await request(mockedServer)
         .post("/register")
         .send({ user: AnakinRegisterData })
@@ -217,11 +190,7 @@ describe("POST /register", () => {
       MockedCreateToken.mockImplementationOnce(() => {
         throw Error("Error: data and hash arguments required")
       })
-      MockedCreateHandleRegistrationErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
-
+ 
       const response = await request(mockedServer)
         .post("/register")
         .send({ user: AnakinRegisterData })
@@ -277,10 +246,6 @@ describe("GET /login", () => {
       MockedGetUserByEmail.mockRejectedValueOnce(
         new Error("Email does not exist")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 400,
-        error: "Email does not exist",
-      })
 
       const response = await request(mockedServer)
         .get("/login")
@@ -292,16 +257,12 @@ describe("GET /login", () => {
     test("returns status code 400, with Wrong password error message", async () => {
       MockedGetUserByEmail.mockResolvedValue(OutgoingAnakinDatabaseObject)
       MockedComparePasswords.mockResolvedValueOnce(false)
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 400,
-        error: "Wrong Password",
-      })
-
+ 
       const response = await request(mockedServer)
         .get("/login")
         .send(AnakinWrongPasswordLoginData)
       expect(response.statusCode).toBe(400)
-      expect(response.body.error).toBe("Wrong Password")
+      expect(response.body.error).toBe("Wrong password")
     })
   })
 
@@ -310,10 +271,6 @@ describe("GET /login", () => {
       MockedGetUserByEmail.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .get("/login")
@@ -327,10 +284,6 @@ describe("GET /login", () => {
       MockedComparePasswords.mockRejectedValueOnce(
         new Error("Error: variable password does not exist")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .get("/login")
@@ -344,10 +297,6 @@ describe("GET /login", () => {
       MockedComparePasswords.mockResolvedValueOnce(true)
       MockedCreateToken.mockImplementationOnce(() => {
         throw Error("Error: data and hash arguments required")
-      })
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
       })
 
       const response = await request(mockedServer)
@@ -394,10 +343,7 @@ describe("PATCH /changePassword", () => {
       MockedGetUserByEmail.mockRejectedValueOnce(
         new Error("Email does not exist")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 400,
-        error: "Email does not exist",
-      })
+
       const response = await request(mockedServer)
         .patch("/changePassword")
         .send(AnakinWrongEmailChangePasswordData)
@@ -409,10 +355,7 @@ describe("PATCH /changePassword", () => {
     test("returns status code 400 with error message Wrong password", async () => {
       MockedGetUserByEmail.mockResolvedValueOnce(OutgoingAnakinDatabaseObject)
       MockedComparePasswords.mockResolvedValueOnce(false)
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 400,
-        error: "Wrong password",
-      })
+
       const response = await request(mockedServer)
         .patch("/changePassword")
         .send(AnakinWrongPasswordChangePasswordData)
@@ -427,10 +370,6 @@ describe("PATCH /changePassword", () => {
       MockedGetUserByEmail.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .patch("/changePassword")
@@ -444,10 +383,7 @@ describe("PATCH /changePassword", () => {
       MockedComparePasswords.mockRejectedValueOnce(
         new Error("Error: variable password does not exist")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
+
 
       const response = await request(mockedServer)
         .patch("/changePassword")
@@ -461,10 +397,6 @@ describe("PATCH /changePassword", () => {
       MockedComparePasswords.mockResolvedValueOnce(true)
       MockedHashPassword.mockRejectedValueOnce({
         error: "No idea what errors this may throw",
-      })
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
       })
 
       const response = await request(mockedServer)
@@ -481,11 +413,6 @@ describe("PATCH /changePassword", () => {
       MockedChangeUserPassword.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .patch("/changePassword")
@@ -536,10 +463,6 @@ describe("PATCH /updateUser", () => {
         new Error("Email does not exist")
       )
 
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 400,
-        error: "Email does not exist",
-      })
       const response = await request(mockedServer)
         .patch("/updateUser")
         .send(AnakingUpdateInfoData)
@@ -553,10 +476,6 @@ describe("PATCH /updateUser", () => {
       MockedGetUserByEmail.mockResolvedValueOnce(1)
       MockedComparePasswords.mockResolvedValueOnce(false)
 
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 400,
-        error: "Wrong password",
-      })
       const response = await request(mockedServer)
         .patch("/updateUser")
         .send(AnakingUpdateInfoData)
@@ -572,10 +491,6 @@ describe("PATCH /updateUser", () => {
       MockedGetUserByEmail.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .patch("/updateUser")
@@ -589,10 +504,6 @@ describe("PATCH /updateUser", () => {
       MockedComparePasswords.mockRejectedValueOnce(
         new Error("Error: variable password does not exist")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .patch("/updateUser")
@@ -606,10 +517,6 @@ describe("PATCH /updateUser", () => {
       MockedComparePasswords.mockResolvedValueOnce(true)
       MockedCreateUserDatabaseObject.mockImplementationOnce(() => {
         throw new Error("TypeError: can't access property 'x' of 'y'")
-      })
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
       })
 
       const response = await request(mockedServer)
@@ -628,10 +535,6 @@ describe("PATCH /updateUser", () => {
       MockedUpdateItemBySelector.mockRejectedValueOnce(
         new Error("Cannot find 'email' email")
       ) // /?some error
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .patch("/updateUser")
@@ -701,10 +604,6 @@ describe("DELETE /delete", () => {
         new Error("Email does not exist")
       )
 
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 400,
-        error: "Email does not exist",
-      })
       const response = await request(mockedServer)
         .delete("/delete")
         .send(AnakinWrongEmailLoginData)
@@ -718,10 +617,6 @@ describe("DELETE /delete", () => {
       MockedGetUserByEmail.mockResolvedValueOnce(1)
       MockedComparePasswords.mockResolvedValueOnce(false)
 
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 400,
-        error: "Wrong password",
-      })
       const response = await request(mockedServer)
         .delete("/delete")
         .send(AnakinWrongPasswordLoginData)
@@ -737,10 +632,6 @@ describe("DELETE /delete", () => {
       MockedGetUserByEmail.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .delete("/delete")
@@ -754,10 +645,6 @@ describe("DELETE /delete", () => {
       MockedComparePasswords.mockRejectedValueOnce(
         new Error("Error: variable password does not exist")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .delete("/delete")
@@ -772,10 +659,6 @@ describe("DELETE /delete", () => {
       MockedDeleteItemBySelector.mockRejectedValueOnce(
         new Error("Cannot email of type undefined")
       )
-      MockedCreateHandleLoginErrors.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .delete("/delete")

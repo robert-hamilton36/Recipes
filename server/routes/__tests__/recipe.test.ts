@@ -21,18 +21,14 @@ import {
   updateRecipe,
   userSavesRecipe,
 } from "../../db/functions/recipe"
-import { handleGetUpdateDeleteRecipes } from "../../functions/errorHandlers"
 import { deleteItemBySelector } from "../../db/functions/basicCrud"
 
 jest.mock("../../db/functions/recipe")
-jest.mock("../../functions/errorHandlers")
 jest.mock("../../db/functions/basicCrud")
 
 const MockedAddRecipe = addRecipe as jest.Mock
 const MockedUserSavesRecipe = userSavesRecipe as jest.Mock
 const MockedGetUsersRecipesByUserId = getUsersRecipesByUserId as jest.Mock
-const MockedHandleGetUpdateDeleteRecipes =
-  handleGetUpdateDeleteRecipes as jest.Mock
 const MockedGetRecipeById = getRecipeById as jest.Mock
 const MockedUpdateRecipe = updateRecipe as jest.Mock
 const MockedDeleteItemBySelector = deleteItemBySelector as jest.Mock
@@ -312,16 +308,11 @@ describe("GET /getUserRecipes/:userId", () => {
       MockedGetUsersRecipesByUserId.mockRejectedValueOnce(
         new GetDBError("recipes")
       )
-      MockedHandleGetUpdateDeleteRecipes.mockReturnValueOnce({
-        code: 400,
-        error: `GetError: Wrong 'recipes' id`,
-      })
 
       const response = await request(mockedServer).get("/getUserRecipes/1")
       expect(response.statusCode).toBe(400)
       expect(response.body.error).toBe(`GetError: Wrong 'recipes' id`)
       expect(MockedGetUsersRecipesByUserId).toHaveBeenCalledTimes(1)
-      expect(MockedHandleGetUpdateDeleteRecipes).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -332,16 +323,11 @@ describe("GET /getUserRecipes/:userId", () => {
       MockedGetUsersRecipesByUserId.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-      MockedHandleGetUpdateDeleteRecipes.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer).get("/getUserRecipes/1")
       expect(response.statusCode).toBe(500)
       expect(response.body.error).toBe("Something went wrong")
       expect(MockedGetUsersRecipesByUserId).toHaveBeenCalledTimes(1)
-      expect(MockedHandleGetUpdateDeleteRecipes).toHaveBeenCalledTimes(1)
     })
   })
 })
@@ -384,16 +370,11 @@ describe("GET /getRecipe/:recipeId", () => {
       jest.clearAllMocks()
 
       MockedGetRecipeById.mockRejectedValueOnce(new GetDBError("recipes"))
-      MockedHandleGetUpdateDeleteRecipes.mockReturnValueOnce({
-        code: 400,
-        error: `GetError: Wrong 'recipes' id`,
-      })
 
       const response = await request(mockedServer).get("/getRecipe/1")
       expect(response.statusCode).toBe(400)
       expect(response.body.error).toBe(`GetError: Wrong 'recipes' id`)
       expect(MockedGetRecipeById).toHaveBeenCalledTimes(1)
-      expect(MockedHandleGetUpdateDeleteRecipes).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -404,16 +385,11 @@ describe("GET /getRecipe/:recipeId", () => {
       MockedGetRecipeById.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-      MockedHandleGetUpdateDeleteRecipes.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer).get("/getRecipe/1")
       expect(response.statusCode).toBe(500)
       expect(response.body.error).toBe("Something went wrong")
       expect(MockedGetRecipeById).toHaveBeenCalledTimes(1)
-      expect(MockedHandleGetUpdateDeleteRecipes).toHaveBeenCalledTimes(1)
     })
   })
 })
@@ -496,10 +472,6 @@ describe("PATCH /edit", () => {
       jest.clearAllMocks()
 
       MockedUpdateRecipe.mockRejectedValueOnce(new UpdateDBError())
-      MockedHandleGetUpdateDeleteRecipes.mockReturnValueOnce({
-        code: 400,
-        error: "UpdateError: Wrong id",
-      })
 
       const response = await request(mockedServer)
         .patch("/edit/1")
@@ -509,7 +481,6 @@ describe("PATCH /edit", () => {
       expect(response.body.error).toBe("UpdateError: Wrong id")
 
       expect(MockedUpdateRecipe).toHaveBeenCalledTimes(1)
-      expect(MockedHandleGetUpdateDeleteRecipes).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -520,10 +491,6 @@ describe("PATCH /edit", () => {
       MockedUpdateRecipe.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-      MockedHandleGetUpdateDeleteRecipes.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .patch("/edit/1")
@@ -533,7 +500,6 @@ describe("PATCH /edit", () => {
       expect(response.body.error).toBe("Something went wrong")
 
       expect(MockedUpdateRecipe).toHaveBeenCalledTimes(1)
-      expect(MockedHandleGetUpdateDeleteRecipes).toHaveBeenCalledTimes(1)
     })
   })
 })
@@ -615,10 +581,6 @@ describe("DELETE /unsave", () => {
       jest.clearAllMocks()
 
       MockedDeleteItemBySelector.mockRejectedValueOnce(new DeletionDBError())
-      MockedHandleGetUpdateDeleteRecipes.mockReturnValueOnce({
-        code: 400,
-        error: "DeletionError: Wrong id",
-      })
 
       const response = await request(mockedServer)
         .delete("/unsave/1")
@@ -627,7 +589,6 @@ describe("DELETE /unsave", () => {
       expect(response.statusCode).toBe(400)
       expect(response.body.error).toBe("DeletionError: Wrong id")
       expect(MockedDeleteItemBySelector).toHaveBeenCalledTimes(1)
-      expect(MockedHandleGetUpdateDeleteRecipes).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -638,10 +599,6 @@ describe("DELETE /unsave", () => {
       MockedDeleteItemBySelector.mockRejectedValueOnce(
         new Error("Undefined binding(s) detected when compiling FIRST.")
       )
-      MockedHandleGetUpdateDeleteRecipes.mockReturnValueOnce({
-        code: 500,
-        error: "Something went wrong",
-      })
 
       const response = await request(mockedServer)
         .delete("/unsave/1")
@@ -650,7 +607,6 @@ describe("DELETE /unsave", () => {
       expect(response.statusCode).toBe(500)
       expect(response.body.error).toBe("Something went wrong")
       expect(MockedDeleteItemBySelector).toHaveBeenCalledTimes(1)
-      expect(MockedHandleGetUpdateDeleteRecipes).toHaveBeenCalledTimes(1)
     })
   })
 })

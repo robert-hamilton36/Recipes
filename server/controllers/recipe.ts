@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 
 import { deleteItemBySelector } from "../db/functions/basicCrud"
 import {
@@ -9,11 +9,9 @@ import {
   userSavesRecipe,
 } from "../db/functions/recipe"
 
-import { handleGetUpdateDeleteRecipes } from "../functions/errorHandlers"
-
 import { JSONRecipe } from "../types/JSONRecipe"
 
-export const addNewRecipe = async (req: Request, res: Response) => {
+export const addNewRecipe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const jsonRecipe: JSONRecipe = req.body.recipe
     const userId = req.body.userId
@@ -33,12 +31,12 @@ export const addNewRecipe = async (req: Request, res: Response) => {
     await userSavesRecipe(userId, recipeId)
 
     return res.status(201).json({ id: recipeId })
-  } catch (e: unknown) {
-    return res.status(500).json({ error: "Something went wrong" })
+  } catch (err: unknown) {
+    next(err)
   }
 }
 
-export const saveRecipe = async (req: Request, res: Response) => {
+export const saveRecipe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const recipeId = parseInt(req.params.recipeId)
     const userId: number = req.body.userId
@@ -50,38 +48,36 @@ export const saveRecipe = async (req: Request, res: Response) => {
     const id = await userSavesRecipe(userId, recipeId)
 
     return res.status(201).json({ id })
-  } catch (e: unknown) {
-    return res.status(500).json({ error: "Something went wrong" })
+  } catch (err: unknown) {
+    next(err)
   }
 }
 
-export const getUserRecipes = async (req: Request, res: Response) => {
+export const getUserRecipes = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const userId = parseInt(req.params.userId)
 
     const recipes = await getUsersRecipesByUserId(userId)
 
     return res.json({ recipes })
-  } catch (e) {
-    const { code, error } = handleGetUpdateDeleteRecipes(e)
-    return res.status(code).json({ error })
+  } catch (err: unknown) {
+    next(err)
   }
 }
 
-export const getRecipe = async (req: Request, res: Response) => {
+export const getRecipe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const recipeId = parseInt(req.params.recipeId)
 
     const recipe = await getRecipeById(recipeId)
 
     return res.json({ recipe })
-  } catch (e) {
-    const { code, error } = handleGetUpdateDeleteRecipes(e)
-    return res.status(code).json({ error })
+  } catch (err: unknown) {
+    next(err)
   }
 }
 
-export const editRecipe = async (req: Request, res: Response) => {
+export const editRecipe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const recipeId = parseInt(req.params.recipeId)
     const editedRecipe = req.body.editedRecipe as Partial<JSONRecipe>
@@ -94,13 +90,12 @@ export const editRecipe = async (req: Request, res: Response) => {
     await updateRecipe(recipeId, editedRecipe)
 
     return res.json({ edited: true })
-  } catch (e: unknown) {
-    const { code, error } = handleGetUpdateDeleteRecipes(e)
-    return res.status(code).json({ edited: false, error })
+  } catch (err: unknown) {
+    next(err)
   }
 }
 
-export const unsaveRecipe = async (req: Request, res: Response) => {
+export const unsaveRecipe = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const recipe_id = parseInt(req.params.recipeId)
     const user_id = req.body.userId
@@ -113,8 +108,7 @@ export const unsaveRecipe = async (req: Request, res: Response) => {
     await deleteItemBySelector("user_recipes", { user_id, recipe_id })
 
     return res.json({ unsaved: true })
-  } catch (e) {
-    const { code, error } = handleGetUpdateDeleteRecipes(e)
-    return res.status(code).json({ error })
+  } catch (err: unknown) {
+    next(err)
   }
 }

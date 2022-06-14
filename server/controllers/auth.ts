@@ -1,4 +1,4 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
 
 import {
   addItemToDatabase,
@@ -10,16 +10,12 @@ import { changeUserPassword, getUserByEmail } from "../db/functions/users"
 import { comparePasswords, hashPassword } from "../functions/passwords"
 import { createToken } from "../functions/jwt"
 import { createUserDatabaseObject } from "../functions/createDatabaseObjects"
-import {
-  handleLoginErrors,
-  handleRegistrationErrors,
-} from "../functions/errorHandlers"
 
 import { IncomingUser } from "../types/User"
 
 const maxAge = 7 * 24 * 60 * 60 * 1000 // 7 days
 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUser = async (req: Request, res: Response, next:NextFunction) => {
   const user = req.body.user as IncomingUser
 
   try {
@@ -32,12 +28,11 @@ export const registerUser = async (req: Request, res: Response) => {
     res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge })
     res.status(201).json({ id: newUserId })
   } catch (err: unknown) {
-    const { code, error } = handleRegistrationErrors(err)
-    return res.status(code).json({ error })
+    next(err)
   }
 }
 
-export const loginUser = async (req: Request, res: Response) => {
+export const loginUser = async (req: Request, res: Response, next:NextFunction) => {
   const { email, password } = req.body
 
   try {
@@ -50,15 +45,14 @@ export const loginUser = async (req: Request, res: Response) => {
       res.cookie("jwt", token, { httpOnly: true, maxAge: maxAge })
       res.json({ id: user.id })
     } else {
-      throw new Error("Wrong password")
+      next(new Error("Wrong password"))
     }
   } catch (err: unknown) {
-    const { code, error } = handleLoginErrors(err)
-    return res.status(code).json({ error })
+    next(err)
   }
 }
 
-export const changePassword = async (req: Request, res: Response) => {
+export const changePassword = async (req: Request, res: Response, next:NextFunction) => {
   const { email, oldPassword, newPassword } = req.body
 
   try {
@@ -74,18 +68,14 @@ export const changePassword = async (req: Request, res: Response) => {
 
       res.json({ passwordChanged: true })
     } else {
-      throw new Error("Wrong password")
+     next(new Error("Wrong password"))
     }
   } catch (err: unknown) {
-    const { code, error } = handleLoginErrors(err)
-    return res.status(code).json({
-      error,
-      passwordChanged: false,
-    })
+    next(err)
   }
 }
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   const editedUser = req.body.editedUser as IncomingUser
   const email = req.body.email as string
   const password = req.body.password as string
@@ -103,14 +93,10 @@ export const updateUser = async (req: Request, res: Response) => {
 
       return res.json({ userUpdated: true })
     } else {
-      throw new Error("Wrong password")
+      next(new Error("Wrong password"))
     }
   } catch (err: unknown) {
-    const { code, error } = handleLoginErrors(err)
-    return res.status(code).json({
-      error,
-      userUpdated: false,
-    })
+    next(err)
   }
 }
 
@@ -119,7 +105,7 @@ export const logoutUser = async (req: Request, res: Response) => {
   res.json({ id: null })
 }
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (req: Request, res: Response, next:NextFunction) => {
   const { email, password } = req.body
 
   try {
@@ -131,10 +117,9 @@ export const deleteUser = async (req: Request, res: Response) => {
       res.cookie("jwt", "", { httpOnly: true, maxAge: 1 })
       res.json({ deleted: true })
     } else {
-      throw new Error("Wrong password")
+      next(new Error("Wrong password"))
     }
   } catch (err: unknown) {
-    const { code, error } = handleLoginErrors(err)
-    return res.status(code).json({ error })
+    next(err)
   }
 }

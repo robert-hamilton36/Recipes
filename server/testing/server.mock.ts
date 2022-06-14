@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction, Router } from "express"
 import path from "path"
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser"
+import { errorHandler } from "../middleware/errorHandlers"
 
 export const testServerForRoute = (testRoute: Router) => {
   dotenv.config()
@@ -11,8 +12,9 @@ export const testServerForRoute = (testRoute: Router) => {
   server.use(express.json())
   server.use(express.static(path.join(__dirname, "public")))
   server.use(cookieParser())
-
+  
   server.use("/", testRoute)
+  server.use(errorHandler)
 
   return server
 }

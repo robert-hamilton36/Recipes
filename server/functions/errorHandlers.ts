@@ -9,7 +9,7 @@ import {
   UpdateDBError,
 } from "../db/functions/crudDBErrors"
 
-interface KnexError extends Error {
+export interface KnexError extends Error {
   code: string
   errno: number
 }
@@ -31,21 +31,15 @@ export const isUniqueConstraintError = (e: unknown) => {
   }
   return false
 }
-// TODO?? could be combined with Login Errors
-export const handleRegistrationErrors = (err: unknown): ErrorCode => {
+
+export const handleErrors = (err: unknown): ErrorCode => {
   if (isUniqueConstraintError(err)) {
     return {
       code: 400,
       error: "Email is taken",
     }
   }
-  return {
-    code: 500,
-    error: "Something went wrong",
-  }
-}
 
-export const handleLoginErrors = (err: unknown): ErrorCode => {
   if (err instanceof Error) {
     // Wrong password thrown from loginUser() from  controllers/auth
     // Email does not exist thrown from getUserByEmail() /db/functions/users
@@ -59,13 +53,7 @@ export const handleLoginErrors = (err: unknown): ErrorCode => {
       }
     }
   }
-  return {
-    code: 500,
-    error: "Something went wrong",
-  }
-}
 
-export const handleGetUpdateDeleteRecipes = (err: unknown): ErrorCode => {
   if (
     err instanceof GetDBError ||
     err instanceof DeletionDBError ||
@@ -82,6 +70,7 @@ export const handleGetUpdateDeleteRecipes = (err: unknown): ErrorCode => {
       error: `${err.name}: Wrong id`,
     }
   }
+
   return {
     code: 500,
     error: "Something went wrong",
