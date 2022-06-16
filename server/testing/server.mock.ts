@@ -25,6 +25,10 @@ export const testServerForMiddleware = (middleware: Middleware) => {
   server.use(express.json())
   server.use(express.static(path.join(__dirname, "public")))
   server.use(cookieParser())
+ 
+  server.get("/throwError", (req, res, next) => {
+    next(new Error('Test Thrown'))
+  })
 
   server.use(middleware)
   server.get("/", (req, res) => {
@@ -32,7 +36,12 @@ export const testServerForMiddleware = (middleware: Middleware) => {
       result: "no error",
     })
   })
+
   return server
 }
 
-type Middleware = (req: Request, res: Response, next: NextFunction) => void
+type Middleware = MiddleFunction | ErrorHandler
+
+type MiddleFunction = (req: Request, res: Response, next: NextFunction) => void
+
+type ErrorHandler = (error: unknown, req: Request, res: Response, next: NextFunction) => void
